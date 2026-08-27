@@ -62,7 +62,6 @@ When building MVPs or hackathon projects with AI coding agents (Claude Code, Cur
   - Auto-tailors system prompts, composer directives, and milestone execution phases specifically for the selected agent.
   - Offers to launch the agent directly or copies the prompt to your clipboard.
 - **Built-In Starter Templates**:
-  - `salon-vibe`: *The original problem story* — Aesthetic salon booking, stylist vibe-matching quiz, and portfolio galleries.
   - `saas-starter`: B2B SaaS boilerplate with landing page, auth, dashboard, and billing.
   - `ai-workspace`: Futuristic LLM agent playground with streaming chat, live artifact canvas, and prompt versioning.
   - `marketplace`: Peer-to-peer artisan marketplace with search filters, creator storefronts, and order tracking.
@@ -88,7 +87,7 @@ glidingvibe init
 glidingvibe init --output ./specs/my-brief.md
 
 # Start from a template
-glidingvibe init --template salon-vibe
+glidingvibe init --template saas-starter
 
 # Target a specific AI agent
 glidingvibe init --template saas-starter --agent cursor
@@ -171,13 +170,13 @@ import {
 } from 'glidingvibe';
 
 // 1. Load a template
-const template = STARTER_TEMPLATES.find((t) => t.id === 'salon-vibe')!;
+const template = STARTER_TEMPLATES.find((t) => t.id === 'saas-starter')!;
 
 // 2. Generate Markdown Brief
 const briefMarkdown = generateMarkdownBrief({
   ...template.brief,
   createdAt: '2026-08-27',
-  outputPath: './salon-brief.md',
+  outputPath: './saas-brief.md',
 });
 
 // 3. Generate Agent Prompt

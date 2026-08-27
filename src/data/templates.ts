@@ -2,38 +2,6 @@ import type { ProjectTemplate } from '../types/index.js';
 
 export const STARTER_TEMPLATES: ProjectTemplate[] = [
   {
-    id: 'salon-vibe',
-    name: 'Salon Vibe (The Original Story)',
-    description: 'Effortless luxury salon booking & vibe-matched stylist portfolio preview experience',
-    brief: {
-      projectName: 'Gliding Salon Experience',
-      tagline: 'Book the vibe you want with stylists who master your aesthetic.',
-      targetAudience: 'Style-conscious clients looking for curated salon experiences and independent stylists wanting effortless booking & aesthetic portfolios.',
-      problemStatement: 'Traditional salon booking apps feel like sterile calendars. Clients cannot preview the aesthetic vibe or matching styles before booking, leading to mismatched expectations and awkward appointments.',
-      coreFeatures: [
-        'Aesthetic Vibe Quiz & Stylist Matching (match haircuts/color to signature stylist vibes)',
-        'Visual Portfolio Gallery with Before/After sliders and tagged hair textures',
-        'Frictionless 3-Step Booking Flow (Service -> Stylist -> Time Slot with instant SMS/Email confirmation)',
-        'Client Style Moodboard (upload reference photos directly to the appointment brief)',
-        'Stylist Dashboard with daily schedule, client notes, and chair-time management',
-      ],
-      stretchFeatures: [
-        'AR / Virtual Hairstyle & Color Preview Simulator',
-        'Automated re-booking reminders based on hair growth cycles (e.g. 6-week toner refresh)',
-        'In-app tip jar and contactless checkout',
-      ],
-      visualDirection: 'editorial-elegant',
-      copyTone: 'friendly-casual',
-      animationPreference: 'smooth-organic',
-      stack: {
-        frontend: 'nextjs',
-        backend: 'nextjs-api',
-        database: 'supabase',
-        deployment: 'vercel',
-      },
-    },
-  },
-  {
     id: 'saas-starter',
     name: 'Modern SaaS MVP',
     description: 'Clean B2B SaaS boilerplate with landing page, user authentication, usage dashboard, and billing placeholders',

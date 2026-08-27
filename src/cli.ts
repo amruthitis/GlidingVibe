@@ -22,7 +22,7 @@ program
   .command('init', { isDefault: true })
   .description('Start the interactive wizard to generate an AI-agent build brief')
   .option('-o, --output <path>', 'Path to save generated Markdown brief', './glidingvibe-brief.md')
-  .option('-t, --template <name>', 'Starter template to use (e.g. salon-vibe, saas-starter, ai-workspace)')
+  .option('-t, --template <name>', 'Starter template to use (e.g. saas-starter, ai-workspace, marketplace)')
   .option('-a, --agent <name>', 'Target AI coding agent (e.g. claude, cursor, codex, gemini, aider, generic)')
   .option('-y, --yes', 'Skip prompts and generate immediately using template defaults', false)
   .action(async (options) => {
@@ -76,7 +76,7 @@ program
 // Subcommand: templates
 program
   .command('templates')
-  .description('List available starter templates (Salon Experience, SaaS MVP, AI Workspace, etc.)')
+  .description('List available starter templates (SaaS MVP, AI Workspace, Peer-to-Peer Marketplace, etc.)')
   .action(() => {
     try {
       handleTemplatesCommand();

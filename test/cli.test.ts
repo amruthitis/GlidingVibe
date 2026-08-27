@@ -17,20 +17,20 @@ describe('CLI Commands Execution', () => {
 
   it('generates brief non-interactively using template and --yes flag', async () => {
     const brief = await handleInitCommand({
-      template: 'salon-vibe',
+      template: 'ai-workspace',
       output: testOutputPath,
       yes: true,
     });
 
-    expect(brief.projectName).toBe('Gliding Salon Experience');
+    expect(brief.projectName).toBe('HyperPrompt Studio');
     expect(brief.outputPath).toBe(testOutputPath);
 
     const exists = await fileExists(testOutputPath);
     expect(exists).toBe(true);
 
     const fileContent = await fs.readFile(path.resolve(process.cwd(), testOutputPath), 'utf-8');
-    expect(fileContent).toContain('Gliding Salon Experience');
-    expect(fileContent).toContain('Aesthetic Vibe Quiz');
+    expect(fileContent).toContain('HyperPrompt Studio');
+    expect(fileContent).toContain('Streaming Chat Interface');
   });
 
   it('generates brief for SaaS starter template', async () => {

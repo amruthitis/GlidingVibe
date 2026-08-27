@@ -44,7 +44,7 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
         message: 'How would you like to start?',
         options: [
           { value: 'custom', label: 'Start Fresh (Custom Project)', hint: 'Create a tailor-made brief from scratch' },
-          { value: 'template', label: 'Start from a Curated Template', hint: 'Salon Experience, SaaS MVP, AI Studio, etc.' },
+          { value: 'template', label: 'Start from a Curated Template', hint: 'SaaS MVP, AI Studio, etc.' },
         ],
       })
     );

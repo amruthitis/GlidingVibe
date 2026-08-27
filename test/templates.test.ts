@@ -3,14 +3,9 @@ import { STARTER_TEMPLATES } from '../src/data/templates.js';
 import { generateMarkdownBrief } from '../src/generator/markdown.js';
 
 describe('Starter Templates', () => {
-  it('contains the Salon Vibe demo template (the original problem story)', () => {
+  it('does not contain the Salon Vibe demo template', () => {
     const salon = STARTER_TEMPLATES.find((t) => t.id === 'salon-vibe');
-    expect(salon).toBeDefined();
-    expect(salon?.name).toContain('Salon Vibe');
-    expect(salon?.brief.projectName).toContain('Gliding Salon Experience');
-    expect(salon?.brief.coreFeatures.length).toBeGreaterThanOrEqual(3);
-    expect(salon?.brief.stack.frontend).toBe('nextjs');
-    expect(salon?.brief.stack.database).toBe('supabase');
+    expect(salon).toBeUndefined();
   });
 
   it('contains other hackathon starter templates', () => {
