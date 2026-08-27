@@ -33,11 +33,11 @@ export function filterCatalog(options: { category?: string; search?: string }): 
 
 export function displayResourceCard(res: ResourceItem): void {
   const content =
-    `🔗 ${pc.cyan(pc.bold(res.url))}\n\n` +
-    `📖 ${res.description}\n\n` +
-    `🎁 ${pc.bold('Free Tier')}: ${pc.green(res.freeTier)}\n` +
-    `⚖️  ${pc.bold('License Notice')}: ${pc.dim(res.licenseNotice)}\n` +
-    `🏷️  ${pc.bold('Tags')}: ${res.tags.map((t) => pc.magenta(`#${t}`)).join(' ')}`;
+    `URL: ${pc.cyan(pc.bold(res.url))}\n\n` +
+    `Description: ${res.description}\n\n` +
+    `${pc.bold('Free Tier')}: ${pc.green(res.freeTier)}\n` +
+    `${pc.bold('License Notice')}: ${pc.dim(res.licenseNotice)}\n` +
+    `${pc.bold('Tags')}: ${res.tags.map((t) => pc.magenta(`#${t}`)).join(' ')}`;
 
   displayBox(content, `${res.name} [${res.category}/${res.subcategory}]`, 'cyan');
 }
@@ -54,16 +54,16 @@ export async function handleResourcesCommand(options: ResourcesCommandOptions = 
     return;
   }
 
-  intro(pc.bgMagenta(pc.black(' 💎 CURATED FREE RESOURCES EXPLORER ')));
+  intro(pc.bgMagenta(pc.black(' CURATED FREE RESOURCES EXPLORER ')));
 
   const categoryChoice = handleCancel(
     await select({
       message: 'Choose a resource category to browse:',
       options: [
-        { value: 'all', label: '🌟 All Categories', hint: 'Browse all curated free tools & assets' },
+        { value: 'all', label: 'All Categories', hint: 'Browse all curated free tools & assets' },
         ...CATEGORIES.map((c) => ({
           value: c.id,
-          label: `${c.emoji} ${c.name}`,
+          label: c.name,
           hint: c.description,
         })),
       ],
@@ -94,5 +94,5 @@ export async function handleResourcesCommand(options: ResourcesCommandOptions = 
     displayResourceCard(res);
   }
 
-  outro(pc.bgMagenta(pc.black(' ✨ All resources are curated and free for hackathon & MVP builds! ')));
+  outro(pc.bgMagenta(pc.black(' All resources are curated and free for hackathon & MVP builds! ')));
 }

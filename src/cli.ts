@@ -37,7 +37,7 @@ program
       if (err?.name === 'ExitPromptError' || err?.message?.includes('User force closed')) {
         process.exit(0);
       }
-      console.error(pc.red(`\n❌ Error: ${err?.message || err}`));
+      console.error(pc.red(`\nError: ${err?.message || err}`));
       process.exit(1);
     }
   });
@@ -55,7 +55,7 @@ program
         search: options.search,
       });
     } catch (err: any) {
-      console.error(pc.red(`\n❌ Error: ${err?.message || err}`));
+      console.error(pc.red(`\nError: ${err?.message || err}`));
       process.exit(1);
     }
   });
@@ -68,7 +68,7 @@ program
     try {
       await handleAgentsCommand();
     } catch (err: any) {
-      console.error(pc.red(`\n❌ Error: ${err?.message || err}`));
+      console.error(pc.red(`\nError: ${err?.message || err}`));
       process.exit(1);
     }
   });
@@ -81,7 +81,7 @@ program
     try {
       handleTemplatesCommand();
     } catch (err: any) {
-      console.error(pc.red(`\n❌ Error: ${err?.message || err}`));
+      console.error(pc.red(`\nError: ${err?.message || err}`));
       process.exit(1);
     }
   });

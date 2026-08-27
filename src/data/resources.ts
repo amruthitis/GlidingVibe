@@ -4,7 +4,7 @@ export const CATEGORIES: CategoryMetadata[] = [
   {
     id: 'visual',
     name: 'Visual & Design',
-    emoji: '🎨',
+    emoji: '',
     description: 'UI inspiration, component libraries, stock images, icons, illustrations, and fonts',
     subcategories: [
       { id: 'ui-inspiration', name: 'UI & Landing Page Inspiration', description: 'Curated design galleries and real-world UI patterns' },
@@ -19,7 +19,7 @@ export const CATEGORIES: CategoryMetadata[] = [
   {
     id: 'content',
     name: 'Content & Copy',
-    emoji: '✍️',
+    emoji: '',
     description: 'Copywriting frameworks, placeholder mock data, and content structure templates',
     subcategories: [
       { id: 'copywriting', name: 'Copywriting & Value Props', description: 'Conversion-driven headline generators and copy references' },
@@ -30,7 +30,7 @@ export const CATEGORIES: CategoryMetadata[] = [
   {
     id: 'motion',
     name: 'Motion & Interactions',
-    emoji: '✨',
+    emoji: '',
     description: 'Free animation engines, micro-interaction kits, and Lottie animations',
     subcategories: [
       { id: 'animation-libraries', name: 'Animation Libraries', description: 'Declarative animation libraries for React/JS' },
@@ -41,7 +41,7 @@ export const CATEGORIES: CategoryMetadata[] = [
   {
     id: 'engineering',
     name: 'Engineering & Docs',
-    emoji: '🛠️',
+    emoji: '',
     description: 'Frontend, backend, database, auth, and deployment quickstarts and cheat sheets',
     subcategories: [
       { id: 'frontend', name: 'Frontend Guides & Tooling', description: 'React, Next.js, Vite, and styling framework docs' },

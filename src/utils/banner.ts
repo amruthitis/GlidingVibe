@@ -16,15 +16,15 @@ export const BANNER_TEXT = `
 export function printBanner(): void {
   console.log(brandGradient(BANNER_TEXT));
   console.log(
-    pc.dim('  ⚡ Turn your product idea into an AI-agent-ready build brief')
+    pc.dim('  Turn your product idea into an AI-agent-ready build brief')
   );
   console.log(
-    pc.dim('  ✨ Curated Free Resources • Pluggable Agent Adapters • Deployment Checklist\n')
+    pc.dim('  Curated Free Resources • Pluggable Agent Adapters • Deployment Checklist\n')
   );
 }
 
 export function printMiniBanner(): void {
   console.log(
-    `\n  ${brandGradient.multiline('✨ GLIDINGVIBE CLI')} ${pc.dim('— Hackathon Build Brief Generator')}\n`
+    `\n  ${brandGradient.multiline('GLIDINGVIBE CLI')} ${pc.dim('— Hackathon Build Brief Generator')}\n`
   );
 }

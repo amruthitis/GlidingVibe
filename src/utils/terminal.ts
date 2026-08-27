@@ -4,7 +4,7 @@ import { isCancel, cancel } from '@clack/prompts';
 
 export function handleCancel<T>(value: T | symbol): T {
   if (isCancel(value)) {
-    cancel(pc.yellow('✨ GlidingVibe wizard cancelled. See you next time!'));
+    cancel(pc.yellow('GlidingVibe wizard cancelled. See you next time!'));
     process.exit(0);
   }
   return value as T;
@@ -25,7 +25,7 @@ export function displayBox(content: string, title?: string, borderColor: string 
 
 export function setupGracefulExit(): void {
   process.on('SIGINT', () => {
-    console.log(pc.yellow('\n\n👋 Operation interrupted by user. Exiting cleanly.'));
+    console.log(pc.yellow('\n\nOperation interrupted by user. Exiting cleanly.'));
     process.exit(0);
   });
 }

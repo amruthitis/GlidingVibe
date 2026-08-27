@@ -32,7 +32,7 @@ import type { CodingAgentId } from '../types/agents.js';
 
 export async function runInteractiveWizard(options: WizardOptions = {}): Promise<ProjectBrief> {
   printBanner();
-  intro(pc.bgCyan(pc.black(' ✨ GLIDINGVIBE — AI-AGENT BUILD BRIEF WIZARD ')));
+  intro(pc.bgCyan(pc.black(' GLIDINGVIBE — AI-AGENT BUILD BRIEF WIZARD ')));
 
   // 1. Template vs Custom Choice
   let briefBase: Partial<ProjectBrief> = {};
@@ -43,8 +43,8 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
       await select({
         message: 'How would you like to start?',
         options: [
-          { value: 'custom', label: '🚀 Start Fresh (Custom Project)', hint: 'Create a tailor-made brief from scratch' },
-          { value: 'template', label: '📦 Start from a Curated Template', hint: 'Salon Experience, SaaS MVP, AI Studio, etc.' },
+          { value: 'custom', label: 'Start Fresh (Custom Project)', hint: 'Create a tailor-made brief from scratch' },
+          { value: 'template', label: 'Start from a Curated Template', hint: 'Salon Experience, SaaS MVP, AI Studio, etc.' },
         ],
       })
     );
@@ -75,7 +75,7 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
 
     note(
       `${pc.bold(template.name)}\n${pc.dim(template.description)}\n\n` +
-      `💡 ${pc.cyan('Tip:')} You can customize any of these values in the next steps!`,
+      `${pc.cyan('Tip:')} You can customize any of these values in the next steps!`,
       'Loaded Template'
     );
   }
@@ -315,13 +315,13 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
 
   // Summary box
   displayBox(
-    `${pc.bold(pc.white(`✨ ${brief.projectName}`))}\n` +
+    `${pc.bold(pc.white(`${brief.projectName}`))}\n` +
     `${pc.dim(brief.tagline)}\n\n` +
-    `📁 ${pc.cyan('Brief Location')}: ${pc.bold(resolvedPath)}\n` +
-    `🤖 ${pc.cyan('Target Agent')}: ${pc.yellow(selectedAgentId)}\n` +
-    `🛠️  ${pc.cyan('Tech Stack')}: ${frontend} • ${backend} • ${database} • ${deployment}\n` +
-    `🎨 ${pc.cyan('Visual Direction')}: ${visualDirection}\n` +
-    `${copied ? pc.green('\n📋 Implementation prompt copied to clipboard!') : ''}`,
+    `${pc.cyan('Brief Location')}: ${pc.bold(resolvedPath)}\n` +
+    `${pc.cyan('Target Agent')}: ${pc.yellow(selectedAgentId)}\n` +
+    `${pc.cyan('Tech Stack')}: ${frontend} • ${backend} • ${database} • ${deployment}\n` +
+    `${pc.cyan('Visual Direction')}: ${visualDirection}\n` +
+    `${copied ? pc.green('\nImplementation prompt copied to clipboard!') : ''}`,
     'Build Brief Ready',
     'green'
   );
@@ -343,7 +343,7 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
         brief,
       });
 
-      console.log(pc.cyan(`\n🚀 Launching ${chosenAdapterMeta.adapter.name}...`));
+      console.log(pc.cyan(`\nLaunching ${chosenAdapterMeta.adapter.name}...`));
       console.log(pc.dim(`> ${launchCmd.command} ${launchCmd.args.join(' ')}\n`));
 
       await chosenAdapterMeta.adapter.launch({
@@ -354,6 +354,6 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
     }
   }
 
-  outro(pc.bgGreen(pc.black(' 🚀 Ready to build! Happy hacking! ')));
+  outro(pc.bgGreen(pc.black(' Ready to build! Happy hacking! ')));
   return brief;
 }

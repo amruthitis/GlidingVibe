@@ -1,4 +1,4 @@
-# 🚀 GlidingVibe CLI
+# GlidingVibe CLI
 
 [![npm version](https://img.shields.io/badge/npm-v1.0.0-cb3837.svg?style=flat-square)](https://www.npmjs.com/package/glidingvibe)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178c6.svg?style=flat-square)](https://www.typescriptlang.org/)
@@ -20,7 +20,7 @@
 
 ---
 
-## ⚡ Quick Start
+## Quick Start
 
 You can run `glidingvibe` instantly without installing:
 
@@ -37,7 +37,7 @@ glidingvibe
 
 ---
 
-## 💡 Why GlidingVibe?
+## Why GlidingVibe?
 
 When building MVPs or hackathon projects with AI coding agents (Claude Code, Cursor Composer, OpenAI Codex, Gemini CLI, Antigravity, or Aider), prompting from a blank slate often results in:
 - Generic styling and mismatched visual vibes
@@ -49,31 +49,31 @@ When building MVPs or hackathon projects with AI coding agents (Claude Code, Cur
 
 ---
 
-## 🌟 Key Features
+## Key Features
 
-- 🧙 **Guided Terminal Wizard**: Captures project name, elevator pitch, target users, core features, visual vibe, copy tone, animation speed, technical stack, and deployment target.
-- 💎 **Curated Free-Resource Catalogs**:
+- **Guided Terminal Wizard**: Captures project name, elevator pitch, target users, core features, visual vibe, copy tone, animation speed, technical stack, and deployment target.
+- **Curated Free-Resource Catalogs**:
   - **Visual & Design**: UI inspiration galleries (Godly, Mobbin, Land-book), component libraries (shadcn/ui, Aceternity UI, Magic UI, Radix UI, Mantine), stock media (Unsplash, Pexels, SVGBackgrounds), icon packages (Lucide Icons, Tabler Icons, Phosphor Icons), illustration kits (unDraw, OpenPeeps), and typography (Google Fonts, Fontshare).
   - **Content & Copywriting**: Headline formulas (Copywriting Examples), clarity tools (Hemingway Editor), and realistic mock APIs (DummyJSON, JSONPlaceholder).
   - **Motion & Interactions**: Modern animation engines (Motion / Framer Motion, AutoAnimate, Lenis Smooth Scroll, LottieFiles).
   - **Engineering & Docs**: Framework quickstarts, ORM docs (Prisma, Drizzle), databases (Supabase, Turso), and cloud hosts (Vercel, Render, Railway, Cloudflare Pages).
-- 🤖 **Pluggable AI Agent Detection**:
+- **Pluggable AI Agent Detection**:
   - Detects installed coding agent CLIs in real-time on your system (`claude`, `cursor`, `codex`, `agy` / `gemini`, `aider`).
   - Auto-tailors system prompts, composer directives, and milestone execution phases specifically for the selected agent.
   - Offers to launch the agent directly or copies the prompt to your clipboard.
-- 📦 **Built-In Starter Templates**:
+- **Built-In Starter Templates**:
   - `salon-vibe`: *The original problem story* — Aesthetic salon booking, stylist vibe-matching quiz, and portfolio galleries.
   - `saas-starter`: B2B SaaS boilerplate with landing page, auth, dashboard, and billing.
   - `ai-workspace`: Futuristic LLM agent playground with streaming chat, live artifact canvas, and prompt versioning.
   - `marketplace`: Peer-to-peer artisan marketplace with search filters, creator storefronts, and order tracking.
   - `hackathon-speedrun`: Instant full-stack prototype optimized for demo day presentation.
-- 🚀 **Deployment & Environment Checklist**:
+- **Deployment & Environment Checklist**:
   - Provider-specific deployment steps for Vercel, Render, Railway, Cloudflare Pages, Netlify, and Fly.io.
   - Generates `.env.example` pre-populated with database connection strings and security token placeholders.
 
 ---
 
-## 📖 CLI Usage & Subcommands
+## CLI Usage & Subcommands
 
 ### 1. Interactive Build Brief Wizard
 ```bash
@@ -125,7 +125,7 @@ glidingvibe templates
 
 ---
 
-## 🤖 Supported AI Coding Agents
+## Supported AI Coding Agents
 
 | Agent Adapter | Command | Mode | Tailored Features |
 |---|---|---|---|
@@ -138,26 +138,26 @@ glidingvibe templates
 
 ---
 
-## 📁 Generated Brief Structure (`glidingvibe-brief.md`)
+## Generated Brief Structure (`glidingvibe-brief.md`)
 
 ```markdown
-# 🚀 ProjectName — AI Agent Build Brief
-## 📌 1. Product Summary & Problem Statement
-## ✨ 2. Core Feature Specifications (MVP vs Stretch)
-## 🎨 3. Design, Aesthetic & Copywriting Direction
+# ProjectName — AI Agent Build Brief
+## 1. Product Summary & Problem Statement
+## 2. Core Feature Specifications (MVP vs Stretch)
+## 3. Design, Aesthetic & Copywriting Direction
 - Recommended color palette (Hex codes)
 - Typography font pairings
 - Voice & Tone guidelines + CTA formulas
 - Motion curves & transition speeds
-## 🛠️ 4. Technical Stack Architecture & Scaffolding
-## 💎 5. Curated Free Resources Hub (Matched for Your Stack)
-## 🚀 6. Production & Deployment Checklist (.env.example included)
-## 🤖 7. Tailored AI Agent Implementation Prompt
+## 4. Technical Stack Architecture & Scaffolding
+## 5. Curated Free Resources Hub (Matched for Your Stack)
+## 6. Production & Deployment Checklist (.env.example included)
+## 7. Tailored AI Agent Implementation Prompt
 ```
 
 ---
 
-## 💻 Programmatic TypeScript API
+## Programmatic TypeScript API
 
 You can also use GlidingVibe inside your own Node.js / TypeScript scripts:
 
@@ -190,7 +190,7 @@ console.log('Installed agents:', agents.filter(a => a.result.isInstalled));
 
 ---
 
-## 🛠️ Development & Testing
+## Development & Testing
 
 ```bash
 # Install dependencies
@@ -208,7 +208,7 @@ npm run typecheck
 
 ---
 
-## ⚖️ License & Terms
+## License & Terms
 
 - **GlidingVibe CLI** is open-source software licensed under the [MIT License](LICENSE).
 - **External Resources**: All curated external tools, component libraries, typography, mock APIs, and hosting providers referenced in the catalog remain subject to the respective provider's terms of service and license agreements.

@@ -13,7 +13,7 @@ describe('Resource Catalog', () => {
 
     for (const cat of CATEGORIES) {
       expect(cat.name).toBeTruthy();
-      expect(cat.emoji).toBeTruthy();
+      expect(typeof cat.emoji).toBe('string');
       expect(cat.subcategories.length).toBeGreaterThan(0);
     }
   });

@@ -31,10 +31,10 @@ export async function handleInitCommand(options: InitCommandOptions = {}): Promi
     const resolvedPath = await writeBriefToFile(briefPath, markdownContent);
 
     displayBox(
-      `${pc.bold(pc.white(`✨ Generated Brief from Template: ${template.name}`))}\n\n` +
-      `📁 ${pc.cyan('Saved To')}: ${pc.bold(resolvedPath)}\n` +
-      `🤖 ${pc.cyan('Agent Target')}: ${pc.yellow(brief.selectedAgentId || 'Universal')}\n` +
-      `🛠️  ${pc.cyan('Tech Stack')}: ${brief.stack.frontend} • ${brief.stack.backend} • ${brief.stack.database} • ${brief.stack.deployment}`,
+      `${pc.bold(pc.white(`Generated Brief from Template: ${template.name}`))}\n\n` +
+      `${pc.cyan('Saved To')}: ${pc.bold(resolvedPath)}\n` +
+      `${pc.cyan('Agent Target')}: ${pc.yellow(brief.selectedAgentId || 'Universal')}\n` +
+      `${pc.cyan('Tech Stack')}: ${brief.stack.frontend} • ${brief.stack.backend} • ${brief.stack.database} • ${brief.stack.deployment}`,
       'Template Scaffolded',
       'green'
     );

@@ -27,7 +27,7 @@ You are an expert full-stack developer and UI/UX designer. Build a complete, fun
 
 ---
 
-### 🚀 Elevator Pitch & Concept
+### Elevator Pitch & Concept
 > "${brief.tagline}"
 
 - **Target Audience**: ${brief.targetAudience}
@@ -35,7 +35,7 @@ You are an expert full-stack developer and UI/UX designer. Build a complete, fun
 
 ---
 
-### 🛠️ Selected Technical Stack
+### Selected Technical Stack
 - **Frontend**: ${brief.stack.frontend}
 - **Backend**: ${brief.stack.backend}
 - **Database**: ${brief.stack.database}
@@ -43,16 +43,16 @@ You are an expert full-stack developer and UI/UX designer. Build a complete, fun
 
 ---
 
-### 🎨 Visual & Experience Guidelines
+### Visual & Experience Guidelines
 - **Visual Aesthetic**: ${brief.visualDirection}
 - **Brand Voice & Copy Tone**: ${brief.copyTone}
 - **Motion & Interactions**: ${brief.animationPreference}
 
 ---
 
-### 📋 Core Features to Build
+### Core Features to Build
 ${brief.coreFeatures.map((f, i) => `${i + 1}. **${f}**`).join('\n')}
-${brief.stretchFeatures && brief.stretchFeatures.length > 0 ? `\n### 🌟 Stretch Features\n${brief.stretchFeatures.map((f, i) => `- ${f}`).join('\n')}` : ''}
+${brief.stretchFeatures && brief.stretchFeatures.length > 0 ? `\n### Stretch Features\n${brief.stretchFeatures.map((f, i) => `- ${f}`).join('\n')}` : ''}
 
 ---
 
