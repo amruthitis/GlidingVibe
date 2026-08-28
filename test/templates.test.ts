@@ -28,8 +28,9 @@ describe('Starter Templates', () => {
       expect(markdown).toContain(template.brief.tagline);
       expect(markdown).toContain('## 1. Product Summary & Problem Statement');
       expect(markdown).toContain('## 4. Technical Stack Architecture');
-      expect(markdown).toContain('## 6. Production & Deployment Checklist');
-      expect(markdown).toContain('## 7. Tailored AI Agent Implementation Prompt');
+      expect(markdown).toContain('## 6. Cybersecurity Protection & Testing Suite');
+      expect(markdown).toContain('## 7. Production & Deployment Checklist');
+      expect(markdown).toContain('## 8. Tailored AI Agent Implementation Prompt');
     }
   });
 });

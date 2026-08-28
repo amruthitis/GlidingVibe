@@ -65,7 +65,8 @@ describe('AI Agent Prompt Generator', () => {
     expect(prompt).toContain('## 1. Project Overview & Target Audience');
     expect(prompt).toContain('## 2. Technical Stack Architecture');
     expect(prompt).toContain('## 3. UI/UX Design System & Aesthetic Directives');
-    expect(prompt).toContain('## 4. Feature Requirements');
-    expect(prompt).toContain('## 5. Execution Instructions for the AI Agent');
+    expect(prompt).toContain('## 4. Cybersecurity & Application Defense Directives');
+    expect(prompt).toContain('## 5. Feature Requirements');
+    expect(prompt).toContain('## 6. Execution Instructions for the AI Agent');
   });
 });

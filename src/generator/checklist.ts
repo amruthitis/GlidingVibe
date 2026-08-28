@@ -1,12 +1,17 @@
-import type { DeploymentProvider, DatabaseStack, StackSelection } from '../types/index.js';
+import type { DeploymentProvider, DatabaseStack, StackSelection, CybersecurityFeature } from '../types/index.js';
 import { DEPLOYMENT_OPTIONS, DATABASE_OPTIONS } from '../data/stacks.js';
+import { CYBERSECURITY_OPTIONS } from '../data/security.js';
 
 export interface DeploymentChecklistSection {
   title: string;
   items: { task: string; tip?: string }[];
 }
 
-export function generateDeploymentChecklist(provider: DeploymentProvider, database: DatabaseStack): DeploymentChecklistSection[] {
+export function generateDeploymentChecklist(
+  provider: DeploymentProvider,
+  database: DatabaseStack,
+  securityFeatures: CybersecurityFeature[] = ['rate-limiting', 'input-validation', 'cors-headers', 'rbac-rls', 'dependency-audit']
+): DeploymentChecklistSection[] {
   const providerMeta = DEPLOYMENT_OPTIONS.find((p) => p.id === provider);
   const providerName = providerMeta?.name || provider;
 
@@ -111,6 +116,24 @@ export function generateDeploymentChecklist(provider: DeploymentProvider, databa
       items: [
         { task: 'Run production migration command (`npx prisma migrate deploy` or `npx drizzle-kit push`)' },
         { task: 'Verify database connection pooling (e.g., PgBouncer / Neon connection string) for serverless environments' },
+      ],
+    });
+  }
+
+  // Cybersecurity checks
+  if (securityFeatures.length > 0) {
+    const secItems = securityFeatures.map((secId) => {
+      const meta = CYBERSECURITY_OPTIONS.find((s) => s.id === secId);
+      return {
+        task: `${meta?.name || secId}: ${meta?.testStrategy || 'Verify security enforcement.'}`,
+      };
+    });
+
+    sections.push({
+      title: '5. Cybersecurity Protection & Vulnerability Safeguards (Vibecoder Defense)',
+      items: [
+        { task: 'Run security audit (`npm audit --audit-level=high`) and fix critical dependency vulnerabilities' },
+        ...secItems,
       ],
     });
   }

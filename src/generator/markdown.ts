@@ -13,6 +13,7 @@ import {
 import { generateDeploymentChecklist, generateEnvExample } from './checklist.js';
 import { generateAgentPrompt } from './prompt.js';
 import { generateFontImportCss, generateTailwindFontConfig } from '../utils/fonts.js';
+import { CYBERSECURITY_OPTIONS } from '../data/security.js';
 
 export function filterResourcesForBrief(brief: ProjectBrief): {
   recommended: ResourceItem[];
@@ -76,9 +77,14 @@ export function generateMarkdownBrief(brief: ProjectBrief): string {
   const tailwindFontSnippet = generateTailwindFontConfig(primaryFont, secondaryFont);
 
   const { recommended } = filterResourcesForBrief(brief);
-  const checklistSections = generateDeploymentChecklist(brief.stack.deployment, brief.stack.database);
+  const securityFeatures = brief.securityFeatures || ['rate-limiting', 'input-validation', 'cors-headers', 'rbac-rls', 'dependency-audit'];
+  const checklistSections = generateDeploymentChecklist(brief.stack.deployment, brief.stack.database, securityFeatures);
   const envExample = generateEnvExample(brief.stack);
   const agentPrompt = generateAgentPrompt(brief);
+
+  const selectedSecurityOpts = securityFeatures
+    .map((id) => CYBERSECURITY_OPTIONS.find((s) => s.id === id))
+    .filter(Boolean);
 
   return `# ${brief.projectName} — AI Agent Build Brief
 
@@ -156,7 +162,7 @@ ${brief.designScreenshotPath ? `- **Screenshot Mockup Path**: \`${brief.designSc
 
 ### Copywriting Tone: ${copyMeta?.name || brief.copyTone}
 - **Tone Profile**: ${copyMeta?.description || ''}
-- **Tagline Formula**: *${copyMeta?.taglineStyle || ''}*
+- **Tagline Style Formula**: *${copyMeta?.taglineStyle || ''}*
 - **Call-to-Action Example**: \`${copyMeta?.sampleCta || 'Get Started'}\`
 - **Writing Guidelines**:
 ${copyMeta?.guidelines.map((g) => `  - ${g}`).join('\n') || ''}
@@ -207,7 +213,24 @@ ${recommended
 
 ---
 
-## 6. Production & Deployment Checklist
+## 6. Cybersecurity Protection & Testing Suite (Vibecoder Safeguards)
+
+> 🛡️ **Vibecoder Security Alert**: Rapid AI coding often overlooks application defense, exposing sites to OWASP Top 10 exploits. The following security modules are integrated into this build specification:
+
+${selectedSecurityOpts
+  .map(
+    (sec) => `### 🔒 ${sec?.name}
+- **Category**: \`${sec?.category}\`
+- **Description**: ${sec?.description}
+- **Recommended Tools**: ${sec?.recommendedTools.join(', ')}
+- **Implementation Directive**: ${sec?.implementationGuide}
+- **Automated Verification Test**: ${sec?.testStrategy}`
+  )
+  .join('\n\n')}
+
+---
+
+## 7. Production & Deployment Checklist
 
 ${checklistSections
   .map(
@@ -223,7 +246,7 @@ ${envExample}
 
 ---
 
-## 7. Tailored AI Agent Implementation Prompt
+## 8. Tailored AI Agent Implementation Prompt
 
 Copy the prompt block below and feed it directly into your AI coding assistant (Claude Code, Cursor Composer, OpenAI Codex, Gemini CLI / Antigravity, or Aider):
 

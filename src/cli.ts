@@ -26,6 +26,7 @@ program
   .option('-o, --output <path>', 'Path to save generated Markdown brief', './glidingvibe-brief.md')
   .option('-t, --template <name>', 'Starter template to use (e.g. saas-starter, ai-workspace, marketplace)')
   .option('-a, --agent <name>', 'Target AI coding agent (e.g. claude, cursor, codex, gemini, aider, generic)')
+  .option('-s, --security <features...>', 'Select cybersecurity features (e.g. rate-limiting input-validation rbac-rls cors-headers auth-mfa dependency-audit)')
   .option('-y, --yes', 'Skip prompts and generate immediately using template defaults', false)
   .action(async (options) => {
     try {
@@ -33,6 +34,7 @@ program
         output: options.output,
         template: options.template,
         agent: options.agent,
+        security: options.security,
         yes: options.yes,
       });
     } catch (err: any) {

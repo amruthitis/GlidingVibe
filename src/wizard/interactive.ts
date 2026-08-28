@@ -18,6 +18,7 @@ import {
   COPY_TONE_PRESETS,
   ANIMATION_PRESETS,
 } from '../data/stacks.js';
+import { CYBERSECURITY_OPTIONS } from '../data/security.js';
 import { POPULAR_FONTS } from '../data/fonts.js';
 import { downloadFontFiles } from '../utils/fonts.js';
 import type {
@@ -30,6 +31,7 @@ import type {
   BackendStack,
   DatabaseStack,
   DeploymentProvider,
+  CybersecurityFeature,
 } from '../types/index.js';
 import type { CodingAgentId } from '../types/agents.js';
 
@@ -396,6 +398,39 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
     })
   );
 
+  // 13b. Cybersecurity Protection & Testing Selection
+  let securityFeatures: CybersecurityFeature[] = briefBase.securityFeatures || (options.securityFeatures && options.securityFeatures.length > 0 ? options.securityFeatures : [
+    'rate-limiting',
+    'input-validation',
+    'cors-headers',
+    'rbac-rls',
+    'dependency-audit',
+  ]);
+
+  if (!options.nonInteractive) {
+    const customizeSecurity = handleCancel(
+      await confirm({
+        message: 'Protect your website against cyber threats (Vibecoders often ignore security)? Customize security features?',
+        initialValue: false,
+      })
+    );
+
+    if (customizeSecurity) {
+      securityFeatures = handleCancel(
+        await multiselect({
+          message: 'Select Cybersecurity Features & Protections to integrate:',
+          options: CYBERSECURITY_OPTIONS.map((sec) => ({
+            value: sec.id,
+            label: sec.name,
+            hint: `${sec.description} (${sec.recommendedTools.join(', ')})`,
+          })),
+          initialValues: securityFeatures,
+          required: false,
+        })
+      ) as CybersecurityFeature[];
+    }
+  }
+
   // 14. Real-Time AI Agent Detection
   const detectSpinner = spinner();
   detectSpinner.start('Detecting installed AI coding agents on your system...');
@@ -431,6 +466,7 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
     problemStatement,
     coreFeatures,
     stretchFeatures: briefBase.stretchFeatures,
+    securityFeatures,
     visualDirection,
     copyTone,
     animationPreference,
@@ -470,6 +506,7 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
     `${pc.cyan('Target Agent')}: ${pc.yellow(selectedAgentId)}\n` +
     `${pc.cyan('Tech Stack')}: ${frontend} • ${backend} • ${database} • ${deployment}\n` +
     `${pc.cyan('Visual Direction')}: ${visualDirection}\n` +
+    `${pc.cyan('Cybersecurity')}: ${securityFeatures.length} protection modules enabled\n` +
     `${copied ? pc.green('\nImplementation prompt copied to clipboard!') : ''}`,
     'Build Brief Ready',
     'green'

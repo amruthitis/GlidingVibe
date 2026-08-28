@@ -66,13 +66,17 @@ describe('Markdown Brief Generator', () => {
     expect(markdown).toContain('shadcn/ui');
     expect(markdown).toContain('License Notice');
 
-    // Section 6: Production & Deployment Checklist
-    expect(markdown).toContain('## 6. Production & Deployment Checklist');
+    // Section 6: Cybersecurity Protection & Testing Suite
+    expect(markdown).toContain('## 6. Cybersecurity Protection & Testing Suite');
+    expect(markdown).toContain('Rate Limiting & Brute-Force Defense');
+
+    // Section 7: Production & Deployment Checklist
+    expect(markdown).toContain('## 7. Production & Deployment Checklist');
     expect(markdown).toContain('Vercel Deployment Instructions');
     expect(markdown).toContain('DATABASE_URL=');
 
-    // Section 7: Agent Implementation Prompt
-    expect(markdown).toContain('## 7. Tailored AI Agent Implementation Prompt');
+    // Section 8: Agent Implementation Prompt
+    expect(markdown).toContain('## 8. Tailored AI Agent Implementation Prompt');
     expect(markdown).toContain('You are tasked with building "Acme Test Studio"');
   });
 

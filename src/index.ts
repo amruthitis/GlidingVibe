@@ -14,6 +14,7 @@ export {
   COPY_TONE_PRESETS,
   ANIMATION_PRESETS,
 } from './data/stacks.js';
+export { CYBERSECURITY_OPTIONS } from './data/security.js';
 export { STARTER_TEMPLATES } from './data/templates.js';
 
 // Generators

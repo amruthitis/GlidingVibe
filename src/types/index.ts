@@ -1,6 +1,16 @@
 export * from './catalog.js';
 export * from './agents.js';
 
+export type CybersecurityFeature =
+  | 'rate-limiting'
+  | 'input-validation'
+  | 'cors-headers'
+  | 'auth-mfa'
+  | 'rbac-rls'
+  | 'dependency-audit'
+  | 'dast-pentest'
+  | 'bot-captcha';
+
 export type VisualDirection =
   | 'minimal-clean'
   | 'dark-cyberpunk'
@@ -77,6 +87,7 @@ export interface ProjectFeature {
 }
 
 export * from '../data/fonts.js';
+export * from '../data/security.js';
 
 export interface ProjectBrief {
   projectName: string;
@@ -85,6 +96,7 @@ export interface ProjectBrief {
   problemStatement: string;
   coreFeatures: string[];
   stretchFeatures?: string[];
+  securityFeatures?: CybersecurityFeature[];
   visualDirection: VisualDirection;
   copyTone: CopyTone;
   animationPreference: AnimationPreference;
@@ -112,4 +124,5 @@ export interface WizardOptions {
   template?: string;
   agent?: string;
   nonInteractive?: boolean;
+  securityFeatures?: CybersecurityFeature[];
 }

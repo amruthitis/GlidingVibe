@@ -145,4 +145,46 @@ describe('Cybersecurity Analysis & Defense Verification', () => {
       expect(isValidUrl('vbscript:msgbox(1)')).toBe(false);
     });
   });
+
+  describe('5. Cybersecurity Feature Selection & Brief Integration', () => {
+    it('contains comprehensive cybersecurity protection options', async () => {
+      const { CYBERSECURITY_OPTIONS } = await import('../src/data/security.js');
+      expect(CYBERSECURITY_OPTIONS.length).toBeGreaterThanOrEqual(6);
+
+      const rateLimiting = CYBERSECURITY_OPTIONS.find((s) => s.id === 'rate-limiting');
+      expect(rateLimiting).toBeDefined();
+      expect(rateLimiting?.name).toContain('Rate Limiting');
+      expect(rateLimiting?.recommendedTools).toContain('Arcjet');
+
+      const inputValidation = CYBERSECURITY_OPTIONS.find((s) => s.id === 'input-validation');
+      expect(inputValidation).toBeDefined();
+      expect(inputValidation?.recommendedTools).toContain('Zod');
+    });
+
+    it('embeds selected cybersecurity features in Markdown brief and checklist', async () => {
+      const { generateMarkdownBrief } = await import('../src/generator/markdown.js');
+      const { generateDeploymentChecklist } = await import('../src/generator/checklist.js');
+      const { generateAgentPrompt } = await import('../src/generator/prompt.js');
+
+      const secBrief: ProjectBrief = {
+        ...dummyBrief,
+        securityFeatures: ['rate-limiting', 'input-validation', 'cors-headers', 'rbac-rls'],
+      };
+
+      const markdown = generateMarkdownBrief(secBrief);
+      expect(markdown).toContain('Cybersecurity Protection & Testing Suite');
+      expect(markdown).toContain('Rate Limiting & Brute-Force Defense');
+      expect(markdown).toContain('Strict Input Validation');
+
+      const checklist = generateDeploymentChecklist(secBrief.stack.deployment, secBrief.stack.database, secBrief.securityFeatures);
+      const secSection = checklist.find((s) => s.title.includes('Cybersecurity'));
+      expect(secSection).toBeDefined();
+      expect(secSection?.items.length).toBeGreaterThan(1);
+
+      const prompt = generateAgentPrompt(secBrief);
+      expect(prompt).toContain('Cybersecurity & Application Defense Directives');
+      expect(prompt).toContain('rate-limiting');
+      expect(prompt).toContain('input-validation');
+    });
+  });
 });
