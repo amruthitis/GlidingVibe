@@ -76,6 +76,8 @@ export interface ProjectFeature {
   isCore: boolean;
 }
 
+export * from '../data/fonts.js';
+
 export interface ProjectBrief {
   projectName: string;
   tagline: string;
@@ -86,6 +88,12 @@ export interface ProjectBrief {
   visualDirection: VisualDirection;
   copyTone: CopyTone;
   animationPreference: AnimationPreference;
+  primaryFont?: string;
+  secondaryFont?: string;
+  designResource?: string;
+  designPrompt?: string;
+  designReferenceDoc?: string;
+  designScreenshotPath?: string;
   stack: StackSelection;
   selectedAgentId?: string;
   createdAt: string;

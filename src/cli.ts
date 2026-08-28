@@ -8,6 +8,8 @@ import { handleAgentsCommand } from './commands/agents.js';
 import { handleTemplatesCommand } from './commands/templates.js';
 import { setupGracefulExit } from './utils/terminal.js';
 
+import { registerFontsCommand } from './commands/fonts.js';
+
 setupGracefulExit();
 
 const program = new Command();
@@ -48,11 +50,13 @@ program
   .description('Browse curated free UI, content, motion, and engineering resources')
   .option('-c, --category <category>', 'Filter by category (visual, content, motion, engineering, all)')
   .option('-s, --search <query>', 'Search resources by keyword or tag')
+  .option('-u, --ui', 'Display direct clickable web links to top free UI resource websites in terminal')
   .action(async (options) => {
     try {
       await handleResourcesCommand({
         category: options.category,
         search: options.search,
+        ui: options.ui,
       });
     } catch (err: any) {
       console.error(pc.red(`\nError: ${err?.message || err}`));
@@ -85,5 +89,8 @@ program
       process.exit(1);
     }
   });
+
+// Subcommand: fonts
+registerFontsCommand(program);
 
 program.parse(process.argv);

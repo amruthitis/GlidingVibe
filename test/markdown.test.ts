@@ -49,8 +49,8 @@ describe('Markdown Brief Generator', () => {
     expect(markdown).toContain('Visual test recorder with instant selector generation');
     expect(markdown).toContain('Self-healing selectors using vision models');
 
-    // Section 3: Design, Aesthetic & Copy
-    expect(markdown).toContain('## 3. Design, Aesthetic & Copywriting Direction');
+    // Section 3: Design, Aesthetic & Typography Personalization
+    expect(markdown).toContain('## 3. Design, Aesthetic & Typography Personalization');
     expect(markdown).toContain('Dark Mode Cyberpunk');
     expect(markdown).toContain('Technical & Precise');
     expect(markdown).toContain('High Energy & Dynamic');

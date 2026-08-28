@@ -44,8 +44,8 @@ You are an expert autonomous software engineer and product designer. Build a com
 - **Visual Aesthetic**: ${visualMeta?.name || brief.visualDirection}
   - *Summary*: ${visualMeta?.description || ''}
   - *Palette*: Primary \`${visualMeta?.palette.primary}\`, Secondary \`${visualMeta?.palette.secondary}\`, Surface \`${visualMeta?.palette.surface}\`, Text \`${visualMeta?.palette.text}\`, Accent \`${visualMeta?.palette.accent}\`
-  - *Typography*: Headings: **${visualMeta?.fontPairing.heading}**, Body: **${visualMeta?.fontPairing.body}**, Code: **${visualMeta?.fontPairing.mono}**
-  - *Key Principles*:
+  - *Typography*: Headings: **${brief.primaryFont || visualMeta?.fontPairing.heading || 'Inter'}**, Body: **${brief.secondaryFont || visualMeta?.fontPairing.body || 'Plus Jakarta Sans'}**, Code: **${visualMeta?.fontPairing.mono || 'JetBrains Mono'}**
+${brief.designResource ? `  - *Design Inspiration Resource*: ${brief.designResource}\n` : ''}${brief.designPrompt ? `  - *Custom Design Prompt/Vibe*: ${brief.designPrompt}\n` : ''}${brief.designReferenceDoc ? `  - *Design Specification MD*: ${brief.designReferenceDoc}\n` : ''}${brief.designScreenshotPath ? `  - *Screenshot Reference*: ${brief.designScreenshotPath}\n` : ''}  - *Key Principles*:
     ${visualMeta?.designPrinciples.map((p) => `- ${p}`).join('\n    ') || ''}
 
 - **Copywriting Voice & Tone**: ${copyMeta?.name || brief.copyTone}

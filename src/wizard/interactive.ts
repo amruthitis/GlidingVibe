@@ -1,6 +1,7 @@
 import { intro, outro, text, select, multiselect, confirm, spinner, note } from '@clack/prompts';
 import pc from 'picocolors';
 import { handleCancel, displayBox } from '../utils/terminal.js';
+import { displayFreeUiResourceLinks } from '../commands/resources.js';
 import { printBanner } from '../utils/banner.js';
 import { writeBriefToFile } from '../utils/filesystem.js';
 import { copyToClipboard } from '../utils/clipboard.js';
@@ -17,6 +18,8 @@ import {
   COPY_TONE_PRESETS,
   ANIMATION_PRESETS,
 } from '../data/stacks.js';
+import { POPULAR_FONTS } from '../data/fonts.js';
+import { downloadFontFiles } from '../utils/fonts.js';
 import type {
   ProjectBrief,
   WizardOptions,
@@ -175,6 +178,146 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
     })
   );
 
+  // 7b. Design Personalization & Resource Selection
+  let designResource = briefBase.designResource;
+  let designPrompt = briefBase.designPrompt;
+  let designReferenceDoc = briefBase.designReferenceDoc;
+  let designScreenshotPath = briefBase.designScreenshotPath;
+
+  const wantDesignCustomization = handleCancel(
+    await confirm({
+      message: 'Would you like to add custom design resources, prompts, or screenshot references?',
+      initialValue: false,
+    })
+  );
+
+  if (wantDesignCustomization) {
+    const designChoice = handleCancel(
+      await select({
+        message: 'Select primary design reference method:',
+        options: [
+          { value: 'v0-dev', label: 'v0.dev / Generative UI Prompt', hint: 'Provide text prompt or v0 URL' },
+          { value: '21st-dev', label: '21st.dev / Component Snippet', hint: 'Copy component link or snippet' },
+          { value: 'shadcn-ui', label: 'shadcn/ui / Radix UI Blocks', hint: 'Tailwind + Radix accessible blocks' },
+          { value: 'screenshot', label: 'Screenshot Mockup File', hint: 'Path to visual mockup screenshot' },
+          { value: 'custom-md', label: 'Custom Design Brief MD', hint: 'Path or link to design markdown spec' },
+        ],
+      })
+    );
+
+    designResource = designChoice;
+
+    if (designChoice === 'screenshot') {
+      designScreenshotPath = handleCancel(
+        await text({
+          message: 'Enter path to screenshot mockup file (e.g. ./docs/mockup.png):',
+          placeholder: './mockup.png',
+        })
+      );
+    } else if (designChoice === 'custom-md') {
+      designReferenceDoc = handleCancel(
+        await text({
+          message: 'Enter path or URL to design specification MD file:',
+          placeholder: './design-spec.md',
+        })
+      );
+    } else {
+      designPrompt = handleCancel(
+        await text({
+          message: 'Paste your design prompt, aesthetic notes, or component URL:',
+          placeholder: 'A dark glowing bento grid with smooth frosted cards and neon badges...',
+        })
+      );
+    }
+  }
+
+  // 7c. Primary and Secondary Font Selection
+  let primaryFont = briefBase.primaryFont || VISUAL_VIBE_PRESETS[visualDirection as VisualDirection]?.fontPairing.heading || 'Inter';
+  let secondaryFont = briefBase.secondaryFont || VISUAL_VIBE_PRESETS[visualDirection as VisualDirection]?.fontPairing.body || 'Plus Jakarta Sans';
+
+  const customizeFonts = handleCancel(
+    await confirm({
+      message: `Customize typography fonts (Default: Primary "${primaryFont}", Secondary "${secondaryFont}")?`,
+      initialValue: false,
+    })
+  );
+
+  if (customizeFonts) {
+    const fontOptionChoice = handleCancel(
+      await select({
+        message: 'Select Primary Font (Headings & Titles):',
+        options: [
+          ...POPULAR_FONTS.slice(0, 10).map((f) => ({
+            value: f.name,
+            label: `${f.name} (${f.category})`,
+            hint: f.description,
+          })),
+          { value: 'custom', label: 'Enter custom Google Font name...' },
+        ],
+      })
+    );
+
+    if (fontOptionChoice === 'custom') {
+      primaryFont = handleCancel(
+        await text({
+          message: 'Enter Primary Font name (e.g. Space Grotesk, Syne, Geist):',
+          placeholder: 'Space Grotesk',
+          validate(v) {
+            if (!v || !v.trim()) return 'Font name is required!';
+          },
+        })
+      );
+    } else {
+      primaryFont = fontOptionChoice;
+    }
+
+    const secFontOptionChoice = handleCancel(
+      await select({
+        message: 'Select Secondary Font (Body & UI text):',
+        options: [
+          ...POPULAR_FONTS.slice(0, 10).map((f) => ({
+            value: f.name,
+            label: `${f.name} (${f.category})`,
+            hint: f.description,
+          })),
+          { value: 'custom', label: 'Enter custom Google Font name...' },
+        ],
+      })
+    );
+
+    if (secFontOptionChoice === 'custom') {
+      secondaryFont = handleCancel(
+        await text({
+          message: 'Enter Secondary Font name:',
+          placeholder: 'Plus Jakarta Sans',
+          validate(v) {
+            if (!v || !v.trim()) return 'Font name is required!';
+          },
+        })
+      );
+    } else {
+      secondaryFont = secFontOptionChoice;
+    }
+  }
+
+  // Ask to download font files
+  const shouldDownloadFonts = handleCancel(
+    await confirm({
+      message: `Download local .woff2 font files for "${primaryFont}" & "${secondaryFont}" into ./public/fonts?`,
+      initialValue: false,
+    })
+  );
+
+  if (shouldDownloadFonts) {
+    const fontSpinner = spinner();
+    fontSpinner.start(`Downloading font files for ${primaryFont} and ${secondaryFont}...`);
+    await downloadFontFiles(primaryFont, './public/fonts');
+    if (secondaryFont !== primaryFont) {
+      await downloadFontFiles(secondaryFont, './public/fonts');
+    }
+    fontSpinner.stop(pc.green(`✔ Font files saved to ${pc.cyan('./public/fonts')}`));
+  }
+
   // 8. Copy Tone
   const copyTone = handleCancel(
     await select({
@@ -291,6 +434,12 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
     visualDirection,
     copyTone,
     animationPreference,
+    primaryFont,
+    secondaryFont,
+    designResource,
+    designPrompt,
+    designReferenceDoc,
+    designScreenshotPath,
     stack: {
       frontend,
       backend,
@@ -325,6 +474,9 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
     'Build Brief Ready',
     'green'
   );
+
+  // Quick display of Free UI Resource Web Links in CLI interface
+  displayFreeUiResourceLinks();
 
   // Check if chosen agent is installed and offer to launch
   const chosenAdapterMeta = detectedAgents.find((a) => a.adapter.id === selectedAgentId);

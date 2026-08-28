@@ -34,6 +34,9 @@ export {
   GenericAgentAdapter,
 } from './adapters/index.js';
 
+export { POPULAR_FONTS, getFontsByCategory, findFontByName } from './data/fonts.js';
+export { downloadFontFiles, generateFontImportCss, generateTailwindFontConfig, getGoogleFontCssUrl } from './utils/fonts.js';
+
 // Utilities
 export { writeBriefToFile, fileExists } from './utils/filesystem.js';
 export { copyToClipboard } from './utils/clipboard.js';
