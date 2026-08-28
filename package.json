@@ -1,10 +1,10 @@
 {
   "name": "glidingvibe",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Turn your product idea into an AI-agent-ready build brief with curated free resources, stack selection, and deployment checklist.",
   "type": "module",
   "bin": {
-    "glidingvibe": "./dist/cli.js"
+    "glidingvibe": "dist/cli.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

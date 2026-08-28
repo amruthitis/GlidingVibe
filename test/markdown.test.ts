@@ -91,4 +91,17 @@ describe('Markdown Brief Generator', () => {
     expect(resourceIds).toContain('nextjs-docs');
     expect(resourceIds).toContain('vercel-docs');
   });
+
+  it('includes authentication and component prompts when provided', () => {
+    const markdown = generateMarkdownBrief({
+      ...sampleBrief,
+      authMethod: 'magic-link',
+      componentPrompts: [{ component: 'Invite dialog', prompt: 'Invite a teammate by email.\nExplain pending invites.' }],
+    });
+
+    expect(markdown).toContain('### Authentication');
+    expect(markdown).toContain('magic-link');
+    expect(markdown).toContain('### Component Prompts');
+    expect(markdown).toContain('Invite a teammate by email.');
+  });
 });

@@ -1,7 +1,6 @@
 import { intro, outro, text, select, multiselect, confirm, spinner, note } from '@clack/prompts';
 import pc from 'picocolors';
 import { handleCancel, displayBox } from '../utils/terminal.js';
-import { displayFreeUiResourceLinks } from '../commands/resources.js';
 import { printBanner } from '../utils/banner.js';
 import { writeBriefToFile } from '../utils/filesystem.js';
 import { copyToClipboard } from '../utils/clipboard.js';
@@ -21,6 +20,7 @@ import {
 import { CYBERSECURITY_OPTIONS } from '../data/security.js';
 import { POPULAR_FONTS } from '../data/fonts.js';
 import { downloadFontFiles } from '../utils/fonts.js';
+import { FREE_UI_RESOURCES } from '../data/resources.js';
 import type {
   ProjectBrief,
   WizardOptions,
@@ -32,8 +32,39 @@ import type {
   DatabaseStack,
   DeploymentProvider,
   CybersecurityFeature,
+  AuthMethod,
+  ComponentPrompt,
 } from '../types/index.js';
 import type { CodingAgentId } from '../types/agents.js';
+
+async function collectLines(message: string, initialValue = '', required = true): Promise<string> {
+  const lines = initialValue ? initialValue.split('\n').filter(Boolean) : [];
+  let addAnother = true;
+  while (addAnother) {
+    const line = handleCancel(await text({
+      message: lines.length ? 'Add another line (or detail):' : message,
+      initialValue: lines.length === 0 ? initialValue : '',
+      validate(value) {
+        if (required && lines.length === 0 && !value.trim()) return 'Please enter a short description.';
+      },
+    }));
+    if (line.trim()) lines.push(line.trim());
+    addAnother = handleCancel(await confirm({ message: 'Add another line?', initialValue: false }));
+  }
+  return lines.join('\n');
+}
+
+async function collectComponentPrompts(initial: ComponentPrompt[] = []): Promise<ComponentPrompt[]> {
+  const prompts = [...initial];
+  let addAnother = handleCancel(await confirm({ message: 'Add component-specific prompts to copy with the build brief?', initialValue: prompts.length > 0 }));
+  while (addAnother) {
+    const component = handleCancel(await text({ message: 'Component name:', placeholder: 'Pricing table, onboarding, team settings', validate: (v) => !v.trim() ? 'A component name is required.' : undefined }));
+    const prompt = await collectLines('Describe this component. You can add as many lines as you need.');
+    prompts.push({ component, prompt });
+    addAnother = handleCancel(await confirm({ message: 'Add another component prompt?', initialValue: false }));
+  }
+  return prompts;
+}
 
 export async function runInteractiveWizard(options: WizardOptions = {}): Promise<ProjectBrief> {
   printBanner();
@@ -86,7 +117,7 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
   }
 
   // 2. Project Name
-  const projectName = handleCancel(
+  let projectName = handleCancel(
     await text({
       message: 'What is the name of your project?',
       placeholder: briefBase.projectName || 'MyNextBigThing',
@@ -97,20 +128,14 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
     })
   );
 
-  // 3. One-sentence idea / Tagline
-  const tagline = handleCancel(
-    await text({
-      message: 'What is the one-sentence elevator pitch / tagline?',
-      placeholder: briefBase.tagline || 'An AI-powered workspace to streamline team productivity.',
-      initialValue: briefBase.tagline || '',
-      validate(val) {
-        if (!val || val.trim().length < 5) return 'Please provide at least 5 characters for your pitch.';
-      },
-    })
+  // 3. Product idea. Repeatable input keeps detail without requiring terminal multiline tricks.
+  let tagline = await collectLines(
+    'Describe your product idea. Add a second line for context, scope, or a differentiator.',
+    briefBase.tagline || ''
   );
 
   // 4. Target Audience
-  const targetAudience = handleCancel(
+  let targetAudience = handleCancel(
     await text({
       message: 'Who is the target audience / primary user?',
       placeholder: briefBase.targetAudience || 'Indie hackers, startup founders, and design leads.',
@@ -122,15 +147,9 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
   );
 
   // 5. Problem Statement
-  const problemStatement = handleCancel(
-    await text({
-      message: 'What core problem does this solve?',
-      placeholder: briefBase.problemStatement || 'Users currently waste too much time manually coordinating tasks.',
-      initialValue: briefBase.problemStatement || '',
-      validate(val) {
-        if (!val || val.trim().length === 0) return 'Problem statement is required.';
-      },
-    })
+  let problemStatement = await collectLines(
+    'What core problem does this solve? Add context or constraints on additional lines.',
+    briefBase.problemStatement || ''
   );
 
   // 6. Core Features
@@ -167,6 +186,8 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
     }
   }
 
+  let componentPrompts = await collectComponentPrompts(briefBase.componentPrompts);
+
   // 7. Visual Direction
   const visualDirection = handleCancel(
     await select({
@@ -194,6 +215,12 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
   );
 
   if (wantDesignCustomization) {
+    note(
+      FREE_UI_RESOURCES.filter((resource) => ['v0 by vercel', '21st.dev', 'shadcn/ui'].includes(resource.name.toLowerCase()))
+        .map((resource) => `${pc.bold(resource.name)}\n${resource.url}`)
+        .join('\n\n'),
+      'Useful design resources'
+    );
     const designChoice = handleCancel(
       await select({
         message: 'Select primary design reference method:',
@@ -224,12 +251,7 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
         })
       );
     } else {
-      designPrompt = handleCancel(
-        await text({
-          message: 'Paste your design prompt, aesthetic notes, or component URL:',
-          placeholder: 'A dark glowing bento grid with smooth frosted cards and neon badges...',
-        })
-      );
+      designPrompt = await collectLines('Paste your design prompt, aesthetic notes, or component URL. Add more lines if useful.');
     }
   }
 
@@ -385,6 +407,22 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
     })
   );
 
+  let authMethod = handleCancel(
+    await select({
+      message: 'How should people sign in?',
+      initialValue: briefBase.authMethod || 'email-password',
+      options: [
+        { value: 'none', label: 'No sign-in', hint: 'Public or frontend-only project' },
+        { value: 'email-password', label: 'Email and password', hint: 'Standard accounts with reset flow' },
+        { value: 'magic-link', label: 'Email magic link', hint: 'Passwordless sign-in' },
+        { value: 'oauth', label: 'OAuth', hint: 'Google, GitHub, or another provider' },
+        { value: 'oauth-email-password', label: 'OAuth + email/password', hint: 'Offer both paths' },
+        { value: 'passkeys', label: 'Passkeys', hint: 'WebAuthn with a sensible fallback' },
+        { value: 'enterprise-sso', label: 'Enterprise SSO', hint: 'OIDC or SAML organizations' },
+      ],
+    })
+  ) as AuthMethod;
+
   // 13. Deployment Provider
   const deployment = handleCancel(
     await select({
@@ -398,6 +436,36 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
     })
   );
 
+  // A concise review provides an escape hatch without making the user restart the wizard.
+  let editAnswers = handleCancel(await confirm({ message: 'Review or edit earlier answers before creating the brief?', initialValue: false }));
+  while (editAnswers) {
+    const field = handleCancel(await select({
+      message: 'Choose an answer to update:',
+      options: [
+        { value: 'name', label: 'Project name' },
+        { value: 'idea', label: 'Product idea' },
+        { value: 'audience', label: 'Target audience' },
+        { value: 'problem', label: 'Problem statement' },
+        { value: 'features', label: 'Core features' },
+        { value: 'auth', label: 'Authentication method' },
+        { value: 'components', label: 'Component prompts' },
+      ],
+    }));
+    if (field === 'name') projectName = handleCancel(await text({ message: 'Project name:', initialValue: projectName, validate: (v) => !v.trim() ? 'Project name is required.' : undefined }));
+    if (field === 'idea') tagline = await collectLines('Describe your product idea.', tagline);
+    if (field === 'audience') targetAudience = handleCancel(await text({ message: 'Target audience:', initialValue: targetAudience, validate: (v) => !v.trim() ? 'Target audience is required.' : undefined }));
+    if (field === 'problem') problemStatement = await collectLines('What problem does it solve?', problemStatement);
+    if (field === 'features') {
+      const raw = handleCancel(await text({ message: 'Core features (comma-separated):', initialValue: coreFeatures.join(', '), validate: (v) => !v.trim() ? 'At least one feature is required.' : undefined }));
+      coreFeatures = raw.split(',').map((item) => item.trim()).filter(Boolean);
+    }
+    if (field === 'auth') authMethod = handleCancel(await select({ message: 'How should people sign in?', initialValue: authMethod, options: [
+      { value: 'none', label: 'No sign-in' }, { value: 'email-password', label: 'Email and password' }, { value: 'magic-link', label: 'Email magic link' }, { value: 'oauth', label: 'OAuth' }, { value: 'oauth-email-password', label: 'OAuth + email/password' }, { value: 'passkeys', label: 'Passkeys' }, { value: 'enterprise-sso', label: 'Enterprise SSO' },
+    ] })) as AuthMethod;
+    if (field === 'components') componentPrompts = await collectComponentPrompts(componentPrompts);
+    editAnswers = handleCancel(await confirm({ message: 'Edit another answer?', initialValue: false }));
+  }
+
   // 13b. Cybersecurity Protection & Testing Selection
   let securityFeatures: CybersecurityFeature[] = briefBase.securityFeatures || (options.securityFeatures && options.securityFeatures.length > 0 ? options.securityFeatures : [
     'rate-limiting',
@@ -410,7 +478,7 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
   if (!options.nonInteractive) {
     const customizeSecurity = handleCancel(
       await confirm({
-        message: 'Protect your website against cyber threats (Vibecoders often ignore security)? Customize security features?',
+        message: 'Customize security and testing requirements?',
         initialValue: false,
       })
     );
@@ -476,6 +544,8 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
     designPrompt,
     designReferenceDoc,
     designScreenshotPath,
+    authMethod,
+    componentPrompts,
     stack: {
       frontend,
       backend,
@@ -512,9 +582,6 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
     'green'
   );
 
-  // Quick display of Free UI Resource Web Links in CLI interface
-  displayFreeUiResourceLinks();
-
   // Check if chosen agent is installed and offer to launch
   const chosenAdapterMeta = detectedAgents.find((a) => a.adapter.id === selectedAgentId);
   if (chosenAdapterMeta?.result.isInstalled && selectedAgentId !== 'generic') {
@@ -543,6 +610,6 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
     }
   }
 
-  outro(pc.bgGreen(pc.black(' Ready to build! Happy hacking! ')));
+  outro(pc.bgGreen(pc.black(' Brief ready to use ')));
   return brief;
 }

@@ -33,6 +33,23 @@ export function generateDeploymentChecklist(
         { task: 'Verify secrets are scoped properly (Production, Preview, Development)' },
       ],
     },
+    {
+      title: '3. Delivery Pipeline & Operations',
+      items: [
+        { task: 'Add a CI workflow that runs type checks, tests, linting, dependency audit, and production build for every pull request' },
+        { task: 'Protect the main branch and require the CI workflow before merge' },
+        { task: 'Document deploy, rollback, database migration, backup, and restore procedures in the README' },
+        { task: 'Add error tracking, structured logs, uptime checks, and an owner for production alerts before launch' },
+      ],
+    },
+    {
+      title: '4. Scaling When Demand Requires It',
+      items: [
+        { task: 'Start with the selected managed deployment. Measure latency, error rate, database load, and cost before adding infrastructure.' },
+        { task: 'For container workloads, add a Dockerfile, health/readiness endpoints, resource limits, and stateless application configuration.' },
+        { task: 'Use Kubernetes only when multiple services, deployment controls, or operational requirements justify it; keep manifests, secrets, autoscaling, and rollback procedures versioned.' },
+      ],
+    },
   ];
 
   // Provider-specific instructions
@@ -130,7 +147,7 @@ export function generateDeploymentChecklist(
     });
 
     sections.push({
-      title: '5. Cybersecurity Protection & Vulnerability Safeguards (Vibecoder Defense)',
+      title: '5. Cybersecurity Protection & Vulnerability Safeguards',
       items: [
         { task: 'Run security audit (`npm audit --audit-level=high`) and fix critical dependency vulnerabilities' },
         ...secItems,

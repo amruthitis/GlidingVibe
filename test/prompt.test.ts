@@ -69,4 +69,17 @@ describe('AI Agent Prompt Generator', () => {
     expect(prompt).toContain('## 5. Feature Requirements');
     expect(prompt).toContain('## 6. Execution Instructions for the AI Agent');
   });
+
+  it('includes product quality and selected authentication requirements for every agent', () => {
+    const prompt = generateAgentPrompt({
+      ...baseBrief,
+      authMethod: 'oauth-email-password',
+      componentPrompts: [{ component: 'Account settings', prompt: 'Let users update profile details.\nShow a clear save state.' }],
+    }, 'codex');
+
+    expect(prompt).toContain('light/dark/system theme control');
+    expect(prompt).toContain('OAuth plus email/password authentication');
+    expect(prompt).toContain('fake online indicators');
+    expect(prompt).toContain('Account settings');
+  });
 });

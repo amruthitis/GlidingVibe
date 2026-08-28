@@ -1,6 +1,6 @@
 # GlidingVibe CLI
 
-[![npm version](https://img.shields.io/badge/npm-v1.0.0-cb3837.svg?style=flat-square)](https://www.npmjs.com/package/glidingvibe)
+[![npm version](https://img.shields.io/badge/npm-v1.0.2-cb3837.svg?style=flat-square)](https://www.npmjs.com/package/glidingvibe)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178c6.svg?style=flat-square)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18-339933.svg?style=flat-square)](https://nodejs.org/)
@@ -14,9 +14,9 @@
                          |___/                       
 ```
 
-> **Turn any product idea into an AI-agent-ready build brief with built-in Cybersecurity Safeguards & Font Engineering.**  
-> Curated free resources • Cybersecurity protections • Local AI agent detection • Stack selection • Font downloader • Deployment checklist.  
-> **Zero API keys required. No deployment costs. 100% Hackathon & Production ready.**
+Turn a product idea into a clear build brief for the coding agent you already use. GlidingVibe asks about the product, audience, stack, security, authentication, and design direction, then produces a practical implementation prompt and project handoff.
+
+It is for founders, product teams, and people building their first software product, not only hackathon projects. No API key is required to generate a brief.
 
 ---
 
@@ -39,47 +39,55 @@ glidingvibe
 
 ## Why GlidingVibe?
 
-When vibecoding MVPs or hackathon projects with AI coding agents (Claude Code, Cursor Composer, OpenAI Codex, Gemini CLI / Antigravity, or Aider), prompting from a blank slate often leads to critical oversights:
+When building an MVP with an AI coding agent, a blank prompt often leaves important product decisions unspecified:
 - **Ignoring Cybersecurity**: Fast AI coding frequently omits rate-limiting, input schema validation, security headers, anti-CSRF cookies, and database Row-Level Security (RLS) policies, leaving websites exposed to OWASP Top 10 exploits.
 - **Generic Styling**: Mismatched color schemes, missing typography, and default unstyled components.
 - **Disconnected Architectures**: Incompatible ORM or backend setups that break at deploy time.
 - **Missing Deployment Pre-flight**: Forgetting `.env` secrets, missing build scripts, and unhandled production errors.
 
-**GlidingVibe bridges the gap between your product idea and production-grade AI code generation.** It runs an interactive terminal wizard that collects your product vision, configures cybersecurity protections, matches your stack with curated free resources, downloads Google/Figma fonts locally, detects installed AI coding agents, and generates a structured, security-hardened `glidingvibe-brief.md` alongside a tailored agent prompt.
+GlidingVibe collects those choices in an interactive terminal wizard. You can enter an idea across multiple lines, return to earlier answers before generation, save component-specific prompts, choose an authentication approach, and copy the final instruction set into a supported coding agent.
 
 ---
 
+## What it produces
+
+- An editable Markdown brief with product requirements, component prompts, stack choices, security requirements, and direct resource links.
+- A tailored prompt for Claude Code, Cursor, Codex, Gemini CLI, Aider, or a general-purpose assistant.
+- A delivery checklist covering CI, releases, operations, backups, observability, and the point at which containers or Kubernetes make sense.
+- A product-quality baseline: accessible interaction states, responsive navigation, loading and empty states, theme preference, authentication rules, metadata, and no fabricated “live” product state.
+
 ## Key Features
 
-- **🛡️ Cybersecurity Protection & Testing Selection (Vibecoder Defense)**:
+- **Cybersecurity protection and testing selection**:
   - Select and integrate cybersecurity features into your build brief: Rate Limiting (Arcjet/Redis), Strict Input Validation (Zod), Security Headers & CORS (CSP/HSTS), Database Row-Level Security (Supabase RLS), Anti-CSRF/HttpOnly Sessions, Dependency/Secret Auditing (`npm audit`), DAST vulnerability test scripts, and CAPTCHA Bot Defense (Turnstile).
   - Automatically embeds hard security requirements and automated test strategies into the AI agent prompt so the agent writes secure code by default.
-- **🎨 Typography & Font Engineering Engine (`glidingvibe fonts`)**:
+- **Typography and local font support (`glidingvibe fonts`)**:
   - Browse popular Google and Figma fonts by category (Sans-serif, Display, Serif, Monospace).
   - Download `.woff2` font files directly into `./public/fonts` for offline and fast local hosting.
   - Automatically generates Tailwind CSS font configuration snippets and CSS `@import` fallbacks.
   - Built-in parameter sanitization and path traversal defenses.
-- **🖼️ Generative UI & Design Reference Personalization**:
+- **Generative UI and design references**:
   - Integrate v0.dev prompts, 21st.dev component links, shadcn/ui blocks, screenshot mockup paths, and custom markdown design specs directly into your brief.
-- **⚡ Guided Interactive Terminal Wizard**:
-  - Captures project name, elevator pitch, target users, core features, visual vibe, copy tone, animation speed, tech stack, cybersecurity modules, font choices, and deployment provider.
-- **📚 Curated Free-Resource Catalogs**:
+- **Guided interactive terminal wizard**:
+  - Captures the project idea over one or more lines, target users, features, component prompts, visual direction, stack, authentication method, security choices, and deployment provider. Before generation, users can revise earlier answers.
+- **Curated resource catalog**:
   - **Visual & Design**: UI galleries (Godly, Mobbin), component kits (shadcn/ui, Aceternity UI, Magic UI, Radix UI), stock media (Unsplash, SVGBackgrounds), icon sets (Lucide Icons, Tabler Icons), and fonts (Google Fonts, Fontshare).
   - **Content & Copywriting**: Headline formulas, clarity checkers (Hemingway Editor), and mock APIs (DummyJSON, JSONPlaceholder).
   - **Motion & Interactions**: Framer Motion / Motion, AutoAnimate, Lenis Smooth Scroll, LottieFiles.
   - **Engineering & Cloud**: Framework docs, ORMs (Prisma, Drizzle), databases (Supabase, Turso), and cloud hosts (Vercel, Render, Railway, Cloudflare Pages).
-- **🤖 Pluggable AI Agent Detection & Execution**:
+- **Coding agent detection and execution**:
   - Scans system for installed agent CLIs (`claude`, `cursor`, `codex`, `agy` / `gemini`, `aider`).
   - Auto-tailors system prompts, composer directives, and milestone execution phases specifically for the selected agent.
   - Launches the agent directly from the terminal or copies the prompt to your clipboard.
-- **🚀 Built-In Starter Templates**:
+- **Built-in starter templates**:
   - `saas-starter`: B2B SaaS boilerplate with landing page, auth, dashboard, billing, and full security suite.
   - `ai-workspace`: Futuristic LLM agent playground with streaming chat, live artifact canvas, and prompt versioning.
   - `marketplace`: Peer-to-peer artisan marketplace with search filters, creator storefronts, and order tracking.
   - `hackathon-speedrun`: Instant full-stack prototype optimized for demo day presentation.
-- **📋 Production & Deployment Checklist**:
+- **Production and deployment checklist**:
   - Provider-specific deployment steps for Vercel, Render, Railway, Cloudflare Pages, Netlify, and Fly.io.
   - Generates `.env.example` pre-populated with database connection strings and security token placeholders.
+  - Includes CI/CD, rollback, backup, observability, container, and Kubernetes guidance proportional to the project.
 
 ---
 
@@ -199,7 +207,7 @@ glidingvibe templates
 - Motion curves & transition speeds
 ## 4. Technical Stack Architecture & Scaffolding
 ## 5. Curated Free Resources Hub (Matched for Your Stack)
-## 6. Cybersecurity Protection & Testing Suite (Vibecoder Safeguards)
+## 6. Cybersecurity Protection & Testing Suite
 - Rate limiting, Zod validation, CSP headers, RLS policies, npm audit
 - Implementation directives & automated test strategies
 ## 7. Production & Deployment Checklist (.env.example included)

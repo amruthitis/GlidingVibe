@@ -71,6 +71,20 @@ export type DeploymentProvider =
   | 'cloudflare-pages'
   | 'aws-amplify';
 
+export type AuthMethod =
+  | 'none'
+  | 'email-password'
+  | 'magic-link'
+  | 'oauth'
+  | 'oauth-email-password'
+  | 'passkeys'
+  | 'enterprise-sso';
+
+export interface ComponentPrompt {
+  component: string;
+  prompt: string;
+}
+
 export interface StackSelection {
   frontend: FrontendStack;
   backend: BackendStack;
@@ -106,6 +120,8 @@ export interface ProjectBrief {
   designPrompt?: string;
   designReferenceDoc?: string;
   designScreenshotPath?: string;
+  authMethod?: AuthMethod;
+  componentPrompts?: ComponentPrompt[];
   stack: StackSelection;
   selectedAgentId?: string;
   createdAt: string;
