@@ -14,6 +14,7 @@ export {
   COPY_TONE_PRESETS,
   ANIMATION_PRESETS,
 } from './data/stacks.js';
+export { CYBERSECURITY_OPTIONS } from './data/security.js';
 export { STARTER_TEMPLATES } from './data/templates.js';
 
 // Generators
@@ -33,6 +34,9 @@ export {
   AiderAdapter,
   GenericAgentAdapter,
 } from './adapters/index.js';
+
+export { POPULAR_FONTS, getFontsByCategory, findFontByName } from './data/fonts.js';
+export { downloadFontFiles, generateFontImportCss, generateTailwindFontConfig, getGoogleFontCssUrl } from './utils/fonts.js';
 
 // Utilities
 export { writeBriefToFile, fileExists } from './utils/filesystem.js';

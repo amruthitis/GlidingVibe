@@ -5,16 +5,21 @@ import { writeBriefToFile } from '../utils/filesystem.js';
 import { printMiniBanner } from '../utils/banner.js';
 import { displayBox } from '../utils/terminal.js';
 import pc from 'picocolors';
-import type { WizardOptions, ProjectBrief } from '../types/index.js';
+import type { WizardOptions, ProjectBrief, CybersecurityFeature } from '../types/index.js';
 
 export interface InitCommandOptions {
   output?: string;
   template?: string;
   agent?: string;
+  security?: string[];
   yes?: boolean;
 }
 
 export async function handleInitCommand(options: InitCommandOptions = {}): Promise<ProjectBrief> {
+  const securityFeatures = (options.security && options.security.length > 0
+    ? options.security
+    : undefined) as CybersecurityFeature[] | undefined;
+
   if (options.yes && options.template) {
     printMiniBanner();
     const template = STARTER_TEMPLATES.find((t) => t.id === options.template) || STARTER_TEMPLATES[0];
@@ -22,6 +27,7 @@ export async function handleInitCommand(options: InitCommandOptions = {}): Promi
 
     const brief: ProjectBrief = {
       ...template.brief,
+      securityFeatures: securityFeatures || template.brief.securityFeatures,
       selectedAgentId: options.agent || 'generic',
       createdAt: new Date().toISOString().split('T')[0],
       outputPath: briefPath,
@@ -34,7 +40,8 @@ export async function handleInitCommand(options: InitCommandOptions = {}): Promi
       `${pc.bold(pc.white(`Generated Brief from Template: ${template.name}`))}\n\n` +
       `${pc.cyan('Saved To')}: ${pc.bold(resolvedPath)}\n` +
       `${pc.cyan('Agent Target')}: ${pc.yellow(brief.selectedAgentId || 'Universal')}\n` +
-      `${pc.cyan('Tech Stack')}: ${brief.stack.frontend} • ${brief.stack.backend} • ${brief.stack.database} • ${brief.stack.deployment}`,
+      `${pc.cyan('Tech Stack')}: ${brief.stack.frontend} • ${brief.stack.backend} • ${brief.stack.database} • ${brief.stack.deployment}\n` +
+      `${pc.cyan('Cybersecurity')}: ${(brief.securityFeatures || []).length} protection modules enabled`,
       'Template Scaffolded',
       'green'
     );
@@ -46,6 +53,7 @@ export async function handleInitCommand(options: InitCommandOptions = {}): Promi
     outputPath: options.output,
     template: options.template,
     agent: options.agent,
+    securityFeatures,
   };
 
   return runInteractiveWizard(wizardOpts);

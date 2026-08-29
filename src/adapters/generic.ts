@@ -23,7 +23,7 @@ export class GenericAgentAdapter extends BaseAgentAdapter {
   formatPrompt(brief: ProjectBrief): string {
     return `# AI Agent Build Prompt: ${brief.projectName}
 
-You are an expert full-stack developer and UI/UX designer. Build a complete, functional, and visually stunning web application for **${brief.projectName}**.
+You are an experienced full-stack developer and product designer. Build a complete, functional web application for **${brief.projectName}**.
 
 ---
 
@@ -56,7 +56,7 @@ ${brief.stretchFeatures && brief.stretchFeatures.length > 0 ? `\n### Stretch Fea
 
 ---
 
-### 🏗️ Implementation Guidelines
+### Implementation Guidelines
 1. **Scaffold & Setup**: Create a clean, modular folder structure with TypeScript and Tailwind CSS.
 2. **Interactive UI First**: Build responsive components with consistent spacing, polished typography, and accessible contrasts.
 3. **Mock Data & State**: Provide realistic default data so the app looks alive and interactive out of the box.

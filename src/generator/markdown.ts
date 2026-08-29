@@ -12,6 +12,8 @@ import {
 } from '../data/stacks.js';
 import { generateDeploymentChecklist, generateEnvExample } from './checklist.js';
 import { generateAgentPrompt } from './prompt.js';
+import { generateFontImportCss, generateTailwindFontConfig } from '../utils/fonts.js';
+import { CYBERSECURITY_OPTIONS } from '../data/security.js';
 
 export function filterResourcesForBrief(brief: ProjectBrief): {
   recommended: ResourceItem[];
@@ -69,10 +71,20 @@ export function generateMarkdownBrief(brief: ProjectBrief): string {
   const dbMeta = DATABASE_OPTIONS.find((d) => d.id === brief.stack.database);
   const deployMeta = DEPLOYMENT_OPTIONS.find((dp) => dp.id === brief.stack.deployment);
 
+  const primaryFont = brief.primaryFont || visualMeta?.fontPairing.heading || 'Inter';
+  const secondaryFont = brief.secondaryFont || visualMeta?.fontPairing.body || 'Plus Jakarta Sans';
+  const fontCssSnippet = generateFontImportCss(primaryFont, secondaryFont);
+  const tailwindFontSnippet = generateTailwindFontConfig(primaryFont, secondaryFont);
+
   const { recommended } = filterResourcesForBrief(brief);
-  const checklistSections = generateDeploymentChecklist(brief.stack.deployment, brief.stack.database);
+  const securityFeatures = brief.securityFeatures || ['rate-limiting', 'input-validation', 'cors-headers', 'rbac-rls', 'dependency-audit'];
+  const checklistSections = generateDeploymentChecklist(brief.stack.deployment, brief.stack.database, securityFeatures);
   const envExample = generateEnvExample(brief.stack);
   const agentPrompt = generateAgentPrompt(brief);
+
+  const selectedSecurityOpts = securityFeatures
+    .map((id) => CYBERSECURITY_OPTIONS.find((s) => s.id === id))
+    .filter(Boolean);
 
   return `# ${brief.projectName} — AI Agent Build Brief
 
@@ -93,6 +105,9 @@ ${brief.targetAudience}
 ### Problem Statement
 ${brief.problemStatement}
 
+${brief.authMethod ? `### Authentication
+${brief.authMethod}` : ''}
+
 ---
 
 ## 2. Core Feature Specifications
@@ -107,9 +122,17 @@ ${brief.stretchFeatures.map((f) => `- ${f}`).join('\n')}`
     : ''
 }
 
+${
+  brief.componentPrompts?.length
+    ? `### Component Prompts
+${brief.componentPrompts.map(({ component, prompt }, index) => `#### ${index + 1}. ${component}
+${prompt}`).join('\n\n')}`
+    : ''
+}
+
 ---
 
-## 3. Design, Aesthetic & Copywriting Direction
+## 3. Design, Aesthetic & Typography Personalization
 
 ### Visual Vibe: ${visualMeta?.name || brief.visualDirection}
 - **Vibe Description**: ${visualMeta?.description || ''}
@@ -120,16 +143,37 @@ ${brief.stretchFeatures.map((f) => `- ${f}`).join('\n')}`
   - **Surface / Card**: \`${visualMeta?.palette.surface}\`
   - **Accent**: \`${visualMeta?.palette.accent}\`
   - **Text**: \`${visualMeta?.palette.text}\`
-- **Typography Pairing**:
-  - **Headings**: ${visualMeta?.fontPairing.heading}
-  - **Body Text**: ${visualMeta?.fontPairing.body}
-  - **Code / Monospace**: ${visualMeta?.fontPairing.mono}
 - **Design Principles**:
 ${visualMeta?.designPrinciples.map((p) => `  - ${p}`).join('\n') || ''}
 
+### Typography & Font Personalization
+- **Primary Font (Headings)**: \`${primaryFont}\`
+- **Secondary Font (Body)**: \`${secondaryFont}\`
+- **Monospace Font**: \`${visualMeta?.fontPairing.mono || 'JetBrains Mono'}\`
+
+#### CSS Font Import Snippet
+\`\`\`css
+${fontCssSnippet}
+\`\`\`
+
+#### Tailwind CSS Configuration snippet (\`tailwind.config.js\`)
+\`\`\`javascript
+${tailwindFontSnippet}
+\`\`\`
+
+${
+  brief.designResource || brief.designPrompt || brief.designReferenceDoc || brief.designScreenshotPath
+    ? `### Personal Design Reference & Inputs
+${brief.designResource ? `- **Selected Design Resource**: ${brief.designResource}` : ''}
+${brief.designPrompt ? `- **Custom Design Prompt**: ${brief.designPrompt}` : ''}
+${brief.designReferenceDoc ? `- **Reference Markdown / Specification**: ${brief.designReferenceDoc}` : ''}
+${brief.designScreenshotPath ? `- **Screenshot Mockup Path**: \`${brief.designScreenshotPath}\`` : ''}`
+    : ''
+}
+
 ### Copywriting Tone: ${copyMeta?.name || brief.copyTone}
 - **Tone Profile**: ${copyMeta?.description || ''}
-- **Tagline Formula**: *${copyMeta?.taglineStyle || ''}*
+- **Tagline Style Formula**: *${copyMeta?.taglineStyle || ''}*
 - **Call-to-Action Example**: \`${copyMeta?.sampleCta || 'Get Started'}\`
 - **Writing Guidelines**:
 ${copyMeta?.guidelines.map((g) => `  - ${g}`).join('\n') || ''}
@@ -180,7 +224,24 @@ ${recommended
 
 ---
 
-## 6. Production & Deployment Checklist
+## 6. Cybersecurity Protection & Testing Suite
+
+Rapid prototyping still needs application defenses. The following modules are part of this specification:
+
+${selectedSecurityOpts
+  .map(
+    (sec) => `### ${sec?.name}
+- **Category**: \`${sec?.category}\`
+- **Description**: ${sec?.description}
+- **Recommended Tools**: ${sec?.recommendedTools.join(', ')}
+- **Implementation Directive**: ${sec?.implementationGuide}
+- **Automated Verification Test**: ${sec?.testStrategy}`
+  )
+  .join('\n\n')}
+
+---
+
+## 7. Production & Deployment Checklist
 
 ${checklistSections
   .map(
@@ -189,14 +250,14 @@ ${sec.items.map((it) => `- [ ] ${it.task}`).join('\n')}`
   )
   .join('\n\n')}
 
-### 🔐 Environment Variables Template (\`.env.example\`)
+### Environment Variables Template (\`.env.example\`)
 \`\`\`env
 ${envExample}
 \`\`\`
 
 ---
 
-## 7. Tailored AI Agent Implementation Prompt
+## 8. Tailored AI Agent Implementation Prompt
 
 Copy the prompt block below and feed it directly into your AI coding assistant (Claude Code, Cursor Composer, OpenAI Codex, Gemini CLI / Antigravity, or Aider):
 
@@ -206,6 +267,6 @@ ${agentPrompt}
 
 ---
 
-*Generated by **GlidingVibe CLI** — Turn product ideas into AI-agent-ready build briefs in seconds.*
+Generated by GlidingVibe CLI.
 `;
 }

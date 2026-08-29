@@ -25,6 +25,6 @@ export function printBanner(): void {
 
 export function printMiniBanner(): void {
   console.log(
-    `\n  ${brandGradient.multiline('GLIDINGVIBE CLI')} ${pc.dim('— Hackathon Build Brief Generator')}\n`
+    `\n  ${brandGradient.multiline('GLIDINGVIBE CLI')} ${pc.dim('— Product Build Brief Generator')}\n`
   );
 }

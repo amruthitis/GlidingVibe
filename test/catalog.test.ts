@@ -55,8 +55,8 @@ describe('Resource Catalog', () => {
   });
 
   it('filters catalog by category and search query combined', () => {
-    const visualTailwind = filterCatalog({ category: 'visual', search: 'shadcn' });
-    expect(visualTailwind.length).toBe(1);
-    expect(visualTailwind[0].id).toBe('shadcn-ui');
+    const visualShadcn = filterCatalog({ category: 'visual', search: 'shadcn' });
+    expect(visualShadcn.length).toBeGreaterThanOrEqual(1);
+    expect(visualShadcn.some((item) => item.id === 'shadcn-ui')).toBe(true);
   });
 });

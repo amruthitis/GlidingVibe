@@ -1,4 +1,4 @@
-import { exec } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import type {
   AgentAdapter,
@@ -9,7 +9,8 @@ import type {
 } from '../types/agents.js';
 import type { ProjectBrief } from '../types/index.js';
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
+const SAFE_CMD_REGEX = /^[a-zA-Z0-9_-]+$/;
 
 export abstract class BaseAgentAdapter implements AgentAdapter {
   abstract id: CodingAgentId;
@@ -19,19 +20,32 @@ export abstract class BaseAgentAdapter implements AgentAdapter {
   abstract installGuideUrl: string;
 
   protected async checkCommandExists(cmd: string): Promise<{ exists: boolean; path?: string }> {
+    if (!SAFE_CMD_REGEX.test(cmd)) {
+      return { exists: false };
+    }
     try {
-      const checkCmd = process.platform === 'win32' ? `where ${cmd}` : `which ${cmd}`;
-      const { stdout } = await execAsync(checkCmd, { timeout: 3000 });
+      const tool = process.platform === 'win32' ? 'where' : 'which';
+      const { stdout } = await execFileAsync(tool, [cmd], { timeout: 3000 });
       const binaryPath = stdout.trim().split('\n')[0]?.trim();
       return { exists: !!binaryPath, path: binaryPath };
     } catch {
-      return { exists: false };
+      // Direct command fallback with safe array arguments
+      try {
+        await execFileAsync(cmd, ['--version'], { timeout: 3000 });
+        return { exists: true };
+      } catch {
+        return { exists: false };
+      }
     }
   }
 
   protected async getCommandVersion(cmd: string, versionFlag = '--version'): Promise<string | undefined> {
+    if (!SAFE_CMD_REGEX.test(cmd)) {
+      return undefined;
+    }
     try {
-      const { stdout } = await execAsync(`${cmd} ${versionFlag}`, { timeout: 3000 });
+      const safeFlag = SAFE_CMD_REGEX.test(versionFlag.replace(/^-+/, '')) ? versionFlag : '--version';
+      const { stdout } = await execFileAsync(cmd, [safeFlag], { timeout: 3000 });
       const firstLine = stdout.trim().split('\n')[0]?.trim();
       return firstLine || undefined;
     } catch {
@@ -67,6 +81,9 @@ export abstract class BaseAgentAdapter implements AgentAdapter {
 
   async launch(config: AgentLaunchConfig): Promise<AgentLaunchResult> {
     const { command, args } = this.getLaunchCommand(config);
+    if (!SAFE_CMD_REGEX.test(command)) {
+      throw new Error(`Security Exception: Refusing to launch command with invalid characters: ${command}`);
+    }
     const fullCmd = `${command} ${args.map(a => (a.includes(' ') || a.includes('\n') ? `"${a.replace(/"/g, '\\"')}"` : a)).join(' ')}`;
     return {
       success: true,

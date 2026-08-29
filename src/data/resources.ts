@@ -53,6 +53,123 @@ export const CATEGORIES: CategoryMetadata[] = [
   },
 ];
 
+export interface FreeUiResourceWebsite {
+  name: string;
+  url: string;
+  category: 'Generative & AI UI' | 'UI Component Libraries' | 'Design Inspiration' | 'Icons & Vectors' | 'Typography & Fonts' | 'Color & Palettes';
+  description: string;
+  badge?: string;
+}
+
+export const FREE_UI_RESOURCES: FreeUiResourceWebsite[] = [
+  {
+    name: 'v0 by Vercel',
+    url: 'https://v0.dev',
+    category: 'Generative & AI UI',
+    description: 'Generative AI component builder that generates production-ready React & Tailwind UI code from prompts.',
+    badge: 'Popular AI',
+  },
+  {
+    name: '21st.dev',
+    url: 'https://21st.dev',
+    category: 'UI Component Libraries',
+    description: 'The npm for design engineers — copy-paste modern UI components, animations, and prompt snippets.',
+    badge: 'Must Have',
+  },
+  {
+    name: 'shadcn/ui',
+    url: 'https://ui.shadcn.com',
+    category: 'UI Component Libraries',
+    description: 'Beautifully designed, accessible copy-paste components built with Radix UI and Tailwind CSS.',
+    badge: 'Standard',
+  },
+  {
+    name: 'Aceternity UI',
+    url: 'https://ui.aceternity.com',
+    category: 'UI Component Libraries',
+    description: 'Animated components, background effects, and interactive cards built with Tailwind CSS and Framer Motion.',
+    badge: 'Trending',
+  },
+  {
+    name: 'Magic UI',
+    url: 'https://magicui.design',
+    category: 'UI Component Libraries',
+    description: '50+ open-source animated components and bento grid layouts for React & Tailwind CSS.',
+  },
+  {
+    name: 'Godly Website',
+    url: 'https://godly.website',
+    category: 'Design Inspiration',
+    description: 'Curated gallery of top web design featuring interactive animations and dark-mode aesthetics.',
+    badge: 'Inspiration',
+  },
+  {
+    name: 'Mobbin',
+    url: 'https://mobbin.com',
+    category: 'Design Inspiration',
+    description: 'Comprehensive UI & UX library of real-world iOS and web application user flows and screen breakdowns.',
+  },
+  {
+    name: 'Land-book',
+    url: 'https://land-book.com',
+    category: 'Design Inspiration',
+    description: 'Hand-picked showcase of the best landing pages across tech, SaaS, and portfolios.',
+  },
+  {
+    name: 'Lucide Icons',
+    url: 'https://lucide.dev',
+    category: 'Icons & Vectors',
+    description: '1,400+ beautiful & consistent stroke icons with packages for React, Vue, and Svelte.',
+    badge: 'Essential',
+  },
+  {
+    name: 'Tabler Icons',
+    url: 'https://tabler.io/icons',
+    category: 'Icons & Vectors',
+    description: '5,200+ customizable, pixel-perfect stroke and filled SVG vector icons.',
+  },
+  {
+    name: 'unDraw',
+    url: 'https://undraw.co/illustrations',
+    category: 'Icons & Vectors',
+    description: 'Open-source SVG illustration collection with instant on-the-fly brand color palette synchronization.',
+  },
+  {
+    name: 'Open Peeps',
+    url: 'https://www.openpeeps.com',
+    category: 'Icons & Vectors',
+    description: 'Hand-drawn character illustration library under CC0 public domain.',
+  },
+  {
+    name: 'Fontshare',
+    url: 'https://www.fontshare.com',
+    category: 'Typography & Fonts',
+    description: 'Free, high-quality display and sans-serif fonts by the Indian Type Foundry.',
+    badge: 'Free Fonts',
+  },
+  {
+    name: 'Google Fonts',
+    url: 'https://fonts.google.com',
+    category: 'Typography & Fonts',
+    description: 'Over 1,500 open-source font families with fast global CDN hosting.',
+  },
+  {
+    name: 'Coolors',
+    url: 'https://coolors.co',
+    category: 'Color & Palettes',
+    description: 'Super-fast color palette generator with contrast checking and CSS/Tailwind export.',
+  },
+];
+
+export function isValidUrl(urlStr: string): boolean {
+  try {
+    const u = new URL(urlStr);
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 export const RESOURCE_CATALOG: ResourceItem[] = [
   // --- VISUAL: UI INSPIRATION ---
   {
@@ -102,6 +219,31 @@ export const RESOURCE_CATALOG: ResourceItem[] = [
     licenseNotice: 'Artwork belongs to individual designers. Check shot descriptions for open-source files.',
     tags: ['concept', 'creative', 'ui-kit', 'branding'],
     recommendedFor: { visuals: ['playful-vibrant', 'editorial-elegant', 'retro-vintage'] },
+  },
+
+  {
+    id: 'v0-dev',
+    name: 'v0 by Vercel',
+    url: 'https://v0.dev',
+    category: 'visual',
+    subcategory: 'ui-inspiration',
+    description: 'Generative UI platform that turns text prompts and design screenshots into production-ready React/Tailwind code.',
+    freeTier: 'Generous free tier with daily prompt credits and community component search.',
+    licenseNotice: 'Generated code belongs to user. Public creations accessible under platform terms.',
+    tags: ['generative-ui', 'ai-prompts', 'react', 'tailwind', 'shadcn'],
+    recommendedFor: { visuals: ['minimal-clean', 'dark-cyberpunk', 'glassmorphism-glow', 'corporate-modern'] },
+  },
+  {
+    id: '21st-dev',
+    name: '21st.dev',
+    url: 'https://21st.dev',
+    category: 'visual',
+    subcategory: 'ui-inspiration',
+    description: 'The npm for design engineers: copy-paste modern UI components, animations, and prompt snippets created by top community authors.',
+    freeTier: '100% Free open component library.',
+    licenseNotice: 'MIT / Open Source components.',
+    tags: ['components', 'react', 'tailwind', 'framer-motion', 'prompts'],
+    recommendedFor: { visuals: ['dark-cyberpunk', 'minimal-clean', 'playful-vibrant'] },
   },
 
   // --- VISUAL: COMPONENT LIBRARIES ---

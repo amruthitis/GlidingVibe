@@ -17,6 +17,10 @@ import {
   COPY_TONE_PRESETS,
   ANIMATION_PRESETS,
 } from '../data/stacks.js';
+import { CYBERSECURITY_OPTIONS } from '../data/security.js';
+import { POPULAR_FONTS } from '../data/fonts.js';
+import { downloadFontFiles } from '../utils/fonts.js';
+import { FREE_UI_RESOURCES } from '../data/resources.js';
 import type {
   ProjectBrief,
   WizardOptions,
@@ -27,8 +31,40 @@ import type {
   BackendStack,
   DatabaseStack,
   DeploymentProvider,
+  CybersecurityFeature,
+  AuthMethod,
+  ComponentPrompt,
 } from '../types/index.js';
 import type { CodingAgentId } from '../types/agents.js';
+
+async function collectLines(message: string, initialValue = '', required = true): Promise<string> {
+  const lines = initialValue ? initialValue.split('\n').filter(Boolean) : [];
+  let addAnother = true;
+  while (addAnother) {
+    const line = handleCancel(await text({
+      message: lines.length ? 'Add another line (or detail):' : message,
+      initialValue: lines.length === 0 ? initialValue : '',
+      validate(value) {
+        if (required && lines.length === 0 && !value.trim()) return 'Please enter a short description.';
+      },
+    }));
+    if (line.trim()) lines.push(line.trim());
+    addAnother = handleCancel(await confirm({ message: 'Add another line?', initialValue: false }));
+  }
+  return lines.join('\n');
+}
+
+async function collectComponentPrompts(initial: ComponentPrompt[] = []): Promise<ComponentPrompt[]> {
+  const prompts = [...initial];
+  let addAnother = handleCancel(await confirm({ message: 'Add component-specific prompts to copy with the build brief?', initialValue: prompts.length > 0 }));
+  while (addAnother) {
+    const component = handleCancel(await text({ message: 'Component name:', placeholder: 'Pricing table, onboarding, team settings', validate: (v) => !v.trim() ? 'A component name is required.' : undefined }));
+    const prompt = await collectLines('Describe this component. You can add as many lines as you need.');
+    prompts.push({ component, prompt });
+    addAnother = handleCancel(await confirm({ message: 'Add another component prompt?', initialValue: false }));
+  }
+  return prompts;
+}
 
 export async function runInteractiveWizard(options: WizardOptions = {}): Promise<ProjectBrief> {
   printBanner();
@@ -81,7 +117,7 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
   }
 
   // 2. Project Name
-  const projectName = handleCancel(
+  let projectName = handleCancel(
     await text({
       message: 'What is the name of your project?',
       placeholder: briefBase.projectName || 'MyNextBigThing',
@@ -92,20 +128,14 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
     })
   );
 
-  // 3. One-sentence idea / Tagline
-  const tagline = handleCancel(
-    await text({
-      message: 'What is the one-sentence elevator pitch / tagline?',
-      placeholder: briefBase.tagline || 'An AI-powered workspace to streamline team productivity.',
-      initialValue: briefBase.tagline || '',
-      validate(val) {
-        if (!val || val.trim().length < 5) return 'Please provide at least 5 characters for your pitch.';
-      },
-    })
+  // 3. Product idea. Repeatable input keeps detail without requiring terminal multiline tricks.
+  let tagline = await collectLines(
+    'Describe your product idea. Add a second line for context, scope, or a differentiator.',
+    briefBase.tagline || ''
   );
 
   // 4. Target Audience
-  const targetAudience = handleCancel(
+  let targetAudience = handleCancel(
     await text({
       message: 'Who is the target audience / primary user?',
       placeholder: briefBase.targetAudience || 'Indie hackers, startup founders, and design leads.',
@@ -117,15 +147,9 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
   );
 
   // 5. Problem Statement
-  const problemStatement = handleCancel(
-    await text({
-      message: 'What core problem does this solve?',
-      placeholder: briefBase.problemStatement || 'Users currently waste too much time manually coordinating tasks.',
-      initialValue: briefBase.problemStatement || '',
-      validate(val) {
-        if (!val || val.trim().length === 0) return 'Problem statement is required.';
-      },
-    })
+  let problemStatement = await collectLines(
+    'What core problem does this solve? Add context or constraints on additional lines.',
+    briefBase.problemStatement || ''
   );
 
   // 6. Core Features
@@ -162,6 +186,8 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
     }
   }
 
+  let componentPrompts = await collectComponentPrompts(briefBase.componentPrompts);
+
   // 7. Visual Direction
   const visualDirection = handleCancel(
     await select({
@@ -174,6 +200,147 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
       })),
     })
   );
+
+  // 7b. Design Personalization & Resource Selection
+  let designResource = briefBase.designResource;
+  let designPrompt = briefBase.designPrompt;
+  let designReferenceDoc = briefBase.designReferenceDoc;
+  let designScreenshotPath = briefBase.designScreenshotPath;
+
+  const wantDesignCustomization = handleCancel(
+    await confirm({
+      message: 'Would you like to add custom design resources, prompts, or screenshot references?',
+      initialValue: false,
+    })
+  );
+
+  if (wantDesignCustomization) {
+    note(
+      FREE_UI_RESOURCES.filter((resource) => ['v0 by vercel', '21st.dev', 'shadcn/ui'].includes(resource.name.toLowerCase()))
+        .map((resource) => `${pc.bold(resource.name)}\n${resource.url}`)
+        .join('\n\n'),
+      'Useful design resources'
+    );
+    const designChoice = handleCancel(
+      await select({
+        message: 'Select primary design reference method:',
+        options: [
+          { value: 'v0-dev', label: 'v0.dev / Generative UI Prompt', hint: 'Provide text prompt or v0 URL' },
+          { value: '21st-dev', label: '21st.dev / Component Snippet', hint: 'Copy component link or snippet' },
+          { value: 'shadcn-ui', label: 'shadcn/ui / Radix UI Blocks', hint: 'Tailwind + Radix accessible blocks' },
+          { value: 'screenshot', label: 'Screenshot Mockup File', hint: 'Path to visual mockup screenshot' },
+          { value: 'custom-md', label: 'Custom Design Brief MD', hint: 'Path or link to design markdown spec' },
+        ],
+      })
+    );
+
+    designResource = designChoice;
+
+    if (designChoice === 'screenshot') {
+      designScreenshotPath = handleCancel(
+        await text({
+          message: 'Enter path to screenshot mockup file (e.g. ./docs/mockup.png):',
+          placeholder: './mockup.png',
+        })
+      );
+    } else if (designChoice === 'custom-md') {
+      designReferenceDoc = handleCancel(
+        await text({
+          message: 'Enter path or URL to design specification MD file:',
+          placeholder: './design-spec.md',
+        })
+      );
+    } else {
+      designPrompt = await collectLines('Paste your design prompt, aesthetic notes, or component URL. Add more lines if useful.');
+    }
+  }
+
+  // 7c. Primary and Secondary Font Selection
+  let primaryFont = briefBase.primaryFont || VISUAL_VIBE_PRESETS[visualDirection as VisualDirection]?.fontPairing.heading || 'Inter';
+  let secondaryFont = briefBase.secondaryFont || VISUAL_VIBE_PRESETS[visualDirection as VisualDirection]?.fontPairing.body || 'Plus Jakarta Sans';
+
+  const customizeFonts = handleCancel(
+    await confirm({
+      message: `Customize typography fonts (Default: Primary "${primaryFont}", Secondary "${secondaryFont}")?`,
+      initialValue: false,
+    })
+  );
+
+  if (customizeFonts) {
+    const fontOptionChoice = handleCancel(
+      await select({
+        message: 'Select Primary Font (Headings & Titles):',
+        options: [
+          ...POPULAR_FONTS.slice(0, 10).map((f) => ({
+            value: f.name,
+            label: `${f.name} (${f.category})`,
+            hint: f.description,
+          })),
+          { value: 'custom', label: 'Enter custom Google Font name...' },
+        ],
+      })
+    );
+
+    if (fontOptionChoice === 'custom') {
+      primaryFont = handleCancel(
+        await text({
+          message: 'Enter Primary Font name (e.g. Space Grotesk, Syne, Geist):',
+          placeholder: 'Space Grotesk',
+          validate(v) {
+            if (!v || !v.trim()) return 'Font name is required!';
+          },
+        })
+      );
+    } else {
+      primaryFont = fontOptionChoice;
+    }
+
+    const secFontOptionChoice = handleCancel(
+      await select({
+        message: 'Select Secondary Font (Body & UI text):',
+        options: [
+          ...POPULAR_FONTS.slice(0, 10).map((f) => ({
+            value: f.name,
+            label: `${f.name} (${f.category})`,
+            hint: f.description,
+          })),
+          { value: 'custom', label: 'Enter custom Google Font name...' },
+        ],
+      })
+    );
+
+    if (secFontOptionChoice === 'custom') {
+      secondaryFont = handleCancel(
+        await text({
+          message: 'Enter Secondary Font name:',
+          placeholder: 'Plus Jakarta Sans',
+          validate(v) {
+            if (!v || !v.trim()) return 'Font name is required!';
+          },
+        })
+      );
+    } else {
+      secondaryFont = secFontOptionChoice;
+    }
+  }
+
+  // Ask to download font files
+  const shouldDownloadFonts = handleCancel(
+    await confirm({
+      message: `Download local .woff2 font files for "${primaryFont}" & "${secondaryFont}" into ./public/fonts?`,
+      initialValue: false,
+    })
+  );
+
+  if (shouldDownloadFonts) {
+    const fontSpinner = spinner();
+    fontSpinner.start(`Downloading font files for ${primaryFont} and ${secondaryFont}...`);
+    await downloadFontFiles(primaryFont, './public/fonts');
+    if (secondaryFont !== primaryFont) {
+      await downloadFontFiles(secondaryFont, './public/fonts');
+    }
+    fontSpinner.stop(pc.green(`✔ Font files saved to ${pc.cyan('./public/fonts')}`));
+  }
 
   // 8. Copy Tone
   const copyTone = handleCancel(
@@ -240,6 +407,22 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
     })
   );
 
+  let authMethod = handleCancel(
+    await select({
+      message: 'How should people sign in?',
+      initialValue: briefBase.authMethod || 'email-password',
+      options: [
+        { value: 'none', label: 'No sign-in', hint: 'Public or frontend-only project' },
+        { value: 'email-password', label: 'Email and password', hint: 'Standard accounts with reset flow' },
+        { value: 'magic-link', label: 'Email magic link', hint: 'Passwordless sign-in' },
+        { value: 'oauth', label: 'OAuth', hint: 'Google, GitHub, or another provider' },
+        { value: 'oauth-email-password', label: 'OAuth + email/password', hint: 'Offer both paths' },
+        { value: 'passkeys', label: 'Passkeys', hint: 'WebAuthn with a sensible fallback' },
+        { value: 'enterprise-sso', label: 'Enterprise SSO', hint: 'OIDC or SAML organizations' },
+      ],
+    })
+  ) as AuthMethod;
+
   // 13. Deployment Provider
   const deployment = handleCancel(
     await select({
@@ -252,6 +435,69 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
       })),
     })
   );
+
+  // A concise review provides an escape hatch without making the user restart the wizard.
+  let editAnswers = handleCancel(await confirm({ message: 'Review or edit earlier answers before creating the brief?', initialValue: false }));
+  while (editAnswers) {
+    const field = handleCancel(await select({
+      message: 'Choose an answer to update:',
+      options: [
+        { value: 'name', label: 'Project name' },
+        { value: 'idea', label: 'Product idea' },
+        { value: 'audience', label: 'Target audience' },
+        { value: 'problem', label: 'Problem statement' },
+        { value: 'features', label: 'Core features' },
+        { value: 'auth', label: 'Authentication method' },
+        { value: 'components', label: 'Component prompts' },
+      ],
+    }));
+    if (field === 'name') projectName = handleCancel(await text({ message: 'Project name:', initialValue: projectName, validate: (v) => !v.trim() ? 'Project name is required.' : undefined }));
+    if (field === 'idea') tagline = await collectLines('Describe your product idea.', tagline);
+    if (field === 'audience') targetAudience = handleCancel(await text({ message: 'Target audience:', initialValue: targetAudience, validate: (v) => !v.trim() ? 'Target audience is required.' : undefined }));
+    if (field === 'problem') problemStatement = await collectLines('What problem does it solve?', problemStatement);
+    if (field === 'features') {
+      const raw = handleCancel(await text({ message: 'Core features (comma-separated):', initialValue: coreFeatures.join(', '), validate: (v) => !v.trim() ? 'At least one feature is required.' : undefined }));
+      coreFeatures = raw.split(',').map((item) => item.trim()).filter(Boolean);
+    }
+    if (field === 'auth') authMethod = handleCancel(await select({ message: 'How should people sign in?', initialValue: authMethod, options: [
+      { value: 'none', label: 'No sign-in' }, { value: 'email-password', label: 'Email and password' }, { value: 'magic-link', label: 'Email magic link' }, { value: 'oauth', label: 'OAuth' }, { value: 'oauth-email-password', label: 'OAuth + email/password' }, { value: 'passkeys', label: 'Passkeys' }, { value: 'enterprise-sso', label: 'Enterprise SSO' },
+    ] })) as AuthMethod;
+    if (field === 'components') componentPrompts = await collectComponentPrompts(componentPrompts);
+    editAnswers = handleCancel(await confirm({ message: 'Edit another answer?', initialValue: false }));
+  }
+
+  // 13b. Cybersecurity Protection & Testing Selection
+  let securityFeatures: CybersecurityFeature[] = briefBase.securityFeatures || (options.securityFeatures && options.securityFeatures.length > 0 ? options.securityFeatures : [
+    'rate-limiting',
+    'input-validation',
+    'cors-headers',
+    'rbac-rls',
+    'dependency-audit',
+  ]);
+
+  if (!options.nonInteractive) {
+    const customizeSecurity = handleCancel(
+      await confirm({
+        message: 'Customize security and testing requirements?',
+        initialValue: false,
+      })
+    );
+
+    if (customizeSecurity) {
+      securityFeatures = handleCancel(
+        await multiselect({
+          message: 'Select Cybersecurity Features & Protections to integrate:',
+          options: CYBERSECURITY_OPTIONS.map((sec) => ({
+            value: sec.id,
+            label: sec.name,
+            hint: `${sec.description} (${sec.recommendedTools.join(', ')})`,
+          })),
+          initialValues: securityFeatures,
+          required: false,
+        })
+      ) as CybersecurityFeature[];
+    }
+  }
 
   // 14. Real-Time AI Agent Detection
   const detectSpinner = spinner();
@@ -288,9 +534,18 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
     problemStatement,
     coreFeatures,
     stretchFeatures: briefBase.stretchFeatures,
+    securityFeatures,
     visualDirection,
     copyTone,
     animationPreference,
+    primaryFont,
+    secondaryFont,
+    designResource,
+    designPrompt,
+    designReferenceDoc,
+    designScreenshotPath,
+    authMethod,
+    componentPrompts,
     stack: {
       frontend,
       backend,
@@ -321,6 +576,7 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
     `${pc.cyan('Target Agent')}: ${pc.yellow(selectedAgentId)}\n` +
     `${pc.cyan('Tech Stack')}: ${frontend} • ${backend} • ${database} • ${deployment}\n` +
     `${pc.cyan('Visual Direction')}: ${visualDirection}\n` +
+    `${pc.cyan('Cybersecurity')}: ${securityFeatures.length} protection modules enabled\n` +
     `${copied ? pc.green('\nImplementation prompt copied to clipboard!') : ''}`,
     'Build Brief Ready',
     'green'
@@ -354,6 +610,6 @@ export async function runInteractiveWizard(options: WizardOptions = {}): Promise
     }
   }
 
-  outro(pc.bgGreen(pc.black(' Ready to build! Happy hacking! ')));
+  outro(pc.bgGreen(pc.black(' Brief ready to use ')));
   return brief;
 }

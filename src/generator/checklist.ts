@@ -1,12 +1,17 @@
-import type { DeploymentProvider, DatabaseStack, StackSelection } from '../types/index.js';
+import type { DeploymentProvider, DatabaseStack, StackSelection, CybersecurityFeature } from '../types/index.js';
 import { DEPLOYMENT_OPTIONS, DATABASE_OPTIONS } from '../data/stacks.js';
+import { CYBERSECURITY_OPTIONS } from '../data/security.js';
 
 export interface DeploymentChecklistSection {
   title: string;
   items: { task: string; tip?: string }[];
 }
 
-export function generateDeploymentChecklist(provider: DeploymentProvider, database: DatabaseStack): DeploymentChecklistSection[] {
+export function generateDeploymentChecklist(
+  provider: DeploymentProvider,
+  database: DatabaseStack,
+  securityFeatures: CybersecurityFeature[] = ['rate-limiting', 'input-validation', 'cors-headers', 'rbac-rls', 'dependency-audit']
+): DeploymentChecklistSection[] {
   const providerMeta = DEPLOYMENT_OPTIONS.find((p) => p.id === provider);
   const providerName = providerMeta?.name || provider;
 
@@ -26,6 +31,23 @@ export function generateDeploymentChecklist(provider: DeploymentProvider, databa
         { task: 'Create a clean `.env.example` in repo root with placeholder values (never commit real secrets)' },
         { task: `Add all required production environment variables into ${providerName} Project Settings > Environment Variables` },
         { task: 'Verify secrets are scoped properly (Production, Preview, Development)' },
+      ],
+    },
+    {
+      title: '3. Delivery Pipeline & Operations',
+      items: [
+        { task: 'Add a CI workflow that runs type checks, tests, linting, dependency audit, and production build for every pull request' },
+        { task: 'Protect the main branch and require the CI workflow before merge' },
+        { task: 'Document deploy, rollback, database migration, backup, and restore procedures in the README' },
+        { task: 'Add error tracking, structured logs, uptime checks, and an owner for production alerts before launch' },
+      ],
+    },
+    {
+      title: '4. Scaling When Demand Requires It',
+      items: [
+        { task: 'Start with the selected managed deployment. Measure latency, error rate, database load, and cost before adding infrastructure.' },
+        { task: 'For container workloads, add a Dockerfile, health/readiness endpoints, resource limits, and stateless application configuration.' },
+        { task: 'Use Kubernetes only when multiple services, deployment controls, or operational requirements justify it; keep manifests, secrets, autoscaling, and rollback procedures versioned.' },
       ],
     },
   ];
@@ -111,6 +133,24 @@ export function generateDeploymentChecklist(provider: DeploymentProvider, databa
       items: [
         { task: 'Run production migration command (`npx prisma migrate deploy` or `npx drizzle-kit push`)' },
         { task: 'Verify database connection pooling (e.g., PgBouncer / Neon connection string) for serverless environments' },
+      ],
+    });
+  }
+
+  // Cybersecurity checks
+  if (securityFeatures.length > 0) {
+    const secItems = securityFeatures.map((secId) => {
+      const meta = CYBERSECURITY_OPTIONS.find((s) => s.id === secId);
+      return {
+        task: `${meta?.name || secId}: ${meta?.testStrategy || 'Verify security enforcement.'}`,
+      };
+    });
+
+    sections.push({
+      title: '5. Cybersecurity Protection & Vulnerability Safeguards',
+      items: [
+        { task: 'Run security audit (`npm audit --audit-level=high`) and fix critical dependency vulnerabilities' },
+        ...secItems,
       ],
     });
   }

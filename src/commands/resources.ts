@@ -1,6 +1,6 @@
 import { intro, outro, select, text } from '@clack/prompts';
 import pc from 'picocolors';
-import { RESOURCE_CATALOG, CATEGORIES } from '../data/resources.js';
+import { RESOURCE_CATALOG, CATEGORIES, FREE_UI_RESOURCES, isValidUrl } from '../data/resources.js';
 import { handleCancel, displayBox } from '../utils/terminal.js';
 import { printMiniBanner } from '../utils/banner.js';
 import type { ResourceCategory, ResourceItem } from '../types/catalog.js';
@@ -8,6 +8,7 @@ import type { ResourceCategory, ResourceItem } from '../types/catalog.js';
 export interface ResourcesCommandOptions {
   category?: string;
   search?: string;
+  ui?: boolean;
 }
 
 export function filterCatalog(options: { category?: string; search?: string }): ResourceItem[] {
@@ -31,9 +32,33 @@ export function filterCatalog(options: { category?: string; search?: string }): 
   return list;
 }
 
+export function displayFreeUiResourceLinks(): void {
+  const grouped: Record<string, typeof FREE_UI_RESOURCES> = {};
+  for (const item of FREE_UI_RESOURCES) {
+    if (!grouped[item.category]) grouped[item.category] = [];
+    grouped[item.category].push(item);
+  }
+
+  let body = '';
+  for (const [catName, items] of Object.entries(grouped)) {
+    body += `${pc.bold(pc.yellow(`▸ ${catName}`))}\n`;
+    for (const res of items) {
+      const badgeStr = res.badge ? pc.yellow(` [${res.badge}]`) : '';
+      const safeUrl = isValidUrl(res.url) ? res.url : 'https://' + res.url;
+      const hyperlinkedUrl = `\u001b]8;;${safeUrl}\u001b\\${pc.cyan(pc.bold(pc.underline(safeUrl)))}\u001b]8;;\u001b\\`;
+      body += `  • ${pc.bold(res.name)}${badgeStr}\n    ${pc.dim(res.description)}\n    ➜ Link: ${hyperlinkedUrl}\n\n`;
+    }
+  }
+
+  displayBox(body.trimEnd(), '🚀 FREE UI & DESIGN RESOURCE WEBSITES (CLI LINKS)', 'cyan');
+}
+
 export function displayResourceCard(res: ResourceItem): void {
+  const safeUrl = isValidUrl(res.url) ? res.url : 'https://' + res.url;
+  const hyperlinkedUrl = `\u001b]8;;${safeUrl}\u001b\\${pc.cyan(pc.bold(pc.underline(safeUrl)))}\u001b]8;;\u001b\\`;
+
   const content =
-    `URL: ${pc.cyan(pc.bold(res.url))}\n\n` +
+    `URL: ${hyperlinkedUrl}\n\n` +
     `Description: ${res.description}\n\n` +
     `${pc.bold('Free Tier')}: ${pc.green(res.freeTier)}\n` +
     `${pc.bold('License Notice')}: ${pc.dim(res.licenseNotice)}\n` +
@@ -44,6 +69,11 @@ export function displayResourceCard(res: ResourceItem): void {
 
 export async function handleResourcesCommand(options: ResourcesCommandOptions = {}): Promise<void> {
   printMiniBanner();
+
+  if (options.ui) {
+    displayFreeUiResourceLinks();
+    return;
+  }
 
   if (options.category || options.search) {
     const results = filterCatalog(options);
@@ -60,7 +90,8 @@ export async function handleResourcesCommand(options: ResourcesCommandOptions = 
     await select({
       message: 'Choose a resource category to browse:',
       options: [
-        { value: 'all', label: 'All Categories', hint: 'Browse all curated free tools & assets' },
+        { value: 'free-ui', label: '🚀 Free UI Resource Websites (Direct Web Links)', hint: 'v0, 21st.dev, shadcn/ui, Aceternity, Mobbin, Lucide, Fontshare...' },
+        { value: 'all', label: 'All Catalog Categories', hint: 'Browse all curated free tools & assets' },
         ...CATEGORIES.map((c) => ({
           value: c.id,
           label: c.name,
@@ -69,6 +100,12 @@ export async function handleResourcesCommand(options: ResourcesCommandOptions = 
       ],
     })
   );
+
+  if (categoryChoice === 'free-ui') {
+    displayFreeUiResourceLinks();
+    outro(pc.bgMagenta(pc.black(' Click or open any URL directly to accelerate your design workflow! ')));
+    return;
+  }
 
   const searchFilter = handleCancel(
     await text({
